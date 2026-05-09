@@ -5,7 +5,7 @@ import Dashboard from './pages/Dashboard.tsx';
 import RankedLobby from './pages/RankedLobby.tsx';
 import Casino from './pages/Casino.tsx';
 
-export const socket = io('http://localhost:5000');
+export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
 function Sidebar() {
   const location = useLocation();
