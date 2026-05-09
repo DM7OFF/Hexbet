@@ -1,13 +1,15 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History } from 'lucide-react';
 import { io } from 'socket.io-client';
 import Dashboard from './pages/Dashboard.tsx';
 import RankedLobby from './pages/RankedLobby.tsx';
 import Casino from './pages/Casino.tsx';
+import AuthPage from './pages/AuthPage.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
-function Sidebar() {
+function Sidebar({ onLogout }: { onLogout: () => void }) {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
 
@@ -46,7 +48,7 @@ function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t border-white/10 space-y-2">
         <div className="flex items-center gap-3 p-3 rounded-lg bg-surface/50 border border-white/5">
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center">
             <User className="w-5 h-5" />
@@ -56,6 +58,12 @@ function Sidebar() {
             <div className="text-xs text-primary font-mono font-medium">Gold Rank</div>
           </div>
         </div>
+        <button
+          onClick={onLogout}
+          className="w-full text-xs text-gray-500 hover:text-red-400 transition-colors py-1"
+        >
+          Déconnexion
+        </button>
       </div>
     </aside>
   );
@@ -87,24 +95,35 @@ function Topbar() {
   );
 }
 
+function AppLayout({ onLogout }: { onLogout: () => void }) {
+  return (
+    <div className="min-h-screen bg-background text-white font-sans">
+      <Sidebar onLogout={onLogout} />
+      <Topbar />
+      <main className="ml-64 p-8 min-h-[calc(100vh-5rem)]">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/ranked" element={<RankedLobby />} />
+          <Route path="/casino" element={<Casino />} />
+          <Route path="/wallet" element={<div className="text-2xl font-bold p-8">Wallet Integration Coming Soon</div>} />
+          <Route path="/history" element={<div className="text-2xl font-bold p-8">Match History Coming Soon</div>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  if (!isAuthenticated) {
+    return <AuthPage onAuth={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <Router>
-      <div className="min-h-screen bg-background text-white font-sans">
-        <Sidebar />
-        <Topbar />
-        
-        <main className="ml-64 p-8 min-h-[calc(100vh-5rem)]">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/ranked" element={<RankedLobby />} />
-            <Route path="/casino" element={<Casino />} />
-            {/* Fallback routes */}
-            <Route path="/wallet" element={<div className="text-2xl font-bold p-8">Wallet Integration Coming Soon</div>} />
-            <Route path="/history" element={<div className="text-2xl font-bold p-8">Match History Coming Soon</div>} />
-          </Routes>
-        </main>
-      </div>
+      <AppLayout onLogout={() => setIsAuthenticated(false)} />
     </Router>
   );
 }
