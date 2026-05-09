@@ -1,13 +1,10 @@
-import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History } from 'lucide-react';
 import { io } from 'socket.io-client';
-import { supabase } from './lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 import Dashboard from './pages/Dashboard.tsx';
 import RankedLobby from './pages/RankedLobby.tsx';
 import Casino from './pages/Casino.tsx';
-import AuthPage from './pages/AuthPage.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
