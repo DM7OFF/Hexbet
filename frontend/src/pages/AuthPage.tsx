@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Gamepad2, TrendingUp, Zap, Shield, Eye, EyeOff, Trophy, Dice5, Target, CircleDot, AlertCircle } from 'lucide-react';
+import { Gamepad2, TrendingUp, Eye, EyeOff, Trophy, Dice5, Target, CircleDot, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface LiveWin {
