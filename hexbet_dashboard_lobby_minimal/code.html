@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-stake-darker { background-color: #0f212e; }
+        .bg-stake-dark { background-color: #1a2c38; }
+        .bg-stake-surface { background-color: #213743; }
+        .border-stake { border-color: #2f4553; }
+        .text-stake-muted { color: #b1bad3; }
+        .text-stake-primary { color: #00e701; }
+        .bg-stake-primary { background-color: #00e701; }
+        
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00e701",
+                        "on-primary": "#01080e",
+                        "surface": "#1a2c38",
+                        "background": "#0f212e",
+                        "outline": "#2f4553",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-stake-darker text-white font-sans selection:bg-primary/30">
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-4 h-14 bg-stake-dark border-b border-stake">
+<div class="flex items-center gap-8">
+<span class="text-xl font-extrabold italic text-white tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl">hexagon</span> HEXBET
+        </span>
+<nav class="hidden md:flex gap-4">
+<a class="text-white border-b-2 border-primary pb-3 mt-1 text-sm font-semibold" href="#">Arena</a>
+<a class="text-stake-muted text-sm font-semibold hover:text-white transition-colors" href="#">Leaderboard</a>
+<a class="text-stake-muted text-sm font-semibold hover:text-white transition-colors" href="#">Swap</a>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 bg-stake-darker px-3 py-1.5 rounded border border-stake">
+<span class="material-symbols-outlined text-primary text-sm">account_balance_wallet</span>
+<span class="text-sm font-bold text-white">0.428 ETH</span>
+</div>
+<button class="bg-primary text-on-primary font-bold text-sm px-4 py-1.5 rounded hover:brightness-110 active:scale-95 transition-all">Deposit</button>
+<div class="flex items-center gap-3 ml-2">
+<span class="material-symbols-outlined text-stake-muted cursor-pointer hover:text-white transition-colors">notifications</span>
+<img alt="Player Avatar" class="w-8 h-8 rounded-full bg-stake-surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUTJWxpAvjOvGZZUvUCvMyOGOcMV9a92ez0OI7kEQB0Ovp2QttRVj6Rl5iXyunnA7MuP6s6n0E7ufKfEvH4Wh7T6CzB4o8fNGfGNPHPvmoTyX6MLEPMS44yvnC2CI9ZBcJ6CePbhIA02v9MjTRnl15FrzUg6PnKlx4InyABygTpJ5qc6eMMOqWfujz8p9KC1R0d-1zODZkpSRvdLeiw4wn9UPX6k242C2BJPPGe9Xg7a5cGoGPgxNDjR9fhiWrkNLEO0F_OKdVDLs"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-14 h-[calc(100vh-56px)] hidden md:flex flex-col py-4 bg-stake-dark border-r border-stake w-60">
+<div class="px-4 py-3 mb-4">
+<div class="flex items-center gap-3 bg-stake-darker p-3 rounded-lg border border-stake">
+<div class="w-8 h-8 rounded bg-stake-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">person</span>
+</div>
+<div class="overflow-hidden">
+<div class="text-sm font-bold truncate text-white uppercase tracking-tight">Operator_01</div>
+<div class="text-[10px] text-stake-muted font-medium">Elo: 2450 (Elite)</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-2 space-y-1">
+<!-- Games Section -->
+<details class="group/games" open="">
+<summary class="flex items-center justify-between px-3 py-2 cursor-pointer text-stake-muted text-xs font-bold uppercase tracking-wider hover:text-white transition-colors list-none">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-lg">sports_esports</span> Games
+                </div>
+<span class="material-symbols-outlined text-sm group-open/games:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="space-y-0.5 mt-1">
+<a class="bg-stake-surface text-white flex items-center gap-3 px-3 py-2 text-sm font-medium rounded transition-colors" href="#">
+<span class="material-symbols-outlined text-lg text-primary">casino</span> Dice Duel
+                </a>
+<a class="text-stake-muted flex items-center gap-3 px-3 py-2 text-sm font-medium hover:bg-stake-surface hover:text-white rounded transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">trending_up</span> Crash PvP
+                </a>
+<a class="text-stake-muted flex items-center gap-3 px-3 py-2 text-sm font-medium hover:bg-stake-surface hover:text-white rounded transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">published_with_changes</span> Coin Flip
+                </a>
+</div>
+</details>
+<a class="text-stake-muted flex items-center gap-3 px-3 py-2 text-xs font-bold uppercase tracking-wider hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">military_tech</span> Ranked
+        </a>
+<a class="text-stake-muted flex items-center gap-3 px-3 py-2 text-xs font-bold uppercase tracking-wider hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">sensors</span> Live Matches
+        </a>
+</nav>
+<div class="px-3 mt-auto pt-4 space-y-1">
+<a class="text-stake-muted flex items-center gap-3 px-3 py-2 text-sm font-medium hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">help</span> Support
+        </a>
+<a class="text-stake-muted flex items-center gap-3 px-3 py-2 text-sm font-medium hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">settings</span> Settings
+        </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-60 pt-20 pb-20 px-4 min-h-screen">
+<!-- Hero Summary Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-8">
+<div class="lg:col-span-8 relative overflow-hidden bg-stake-dark border border-stake p-8 rounded-xl flex flex-col justify-center min-h-[280px]">
+<div class="absolute inset-0 z-0">
+<img alt="Background" class="w-full h-full object-cover opacity-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYVCFC8_7cnl14mh99c3ux4Oas4PCZVHwEDd-MRkgPFU1EOn8W4ohtX4XKHz6gj-vTDXnf68Mw1Aco6JAbrLSPMqBbXr2wpajNvA4ak1RsV2SymT8tHLhDrB5_Op2_nCETgOV4vPtU2P8b2rQ8aVM7rMXsDHKnVdVkW-OKRUbLZDGIRW1l0PZKJVRlFohnYcK6zRHY-ikEEOQVginxhTjnSXsa6IfhlEC1awJ-9drUS_u571iFelrgpQznz9y_zsYdOkdAy8uoosM"/>
+</div>
+<div class="relative z-10 max-w-lg">
+<div class="flex items-center gap-2 mb-3">
+<span class="bg-primary text-on-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase">Live Event</span>
+<span class="text-stake-muted text-xs font-semibold">Neon Strike Masters</span>
+</div>
+<h1 class="text-4xl font-black mb-6 leading-tight">Dominate the Arena</h1>
+<div class="flex gap-3">
+<button class="bg-primary text-on-primary font-bold px-8 py-2.5 rounded hover:brightness-110 transition-all text-sm">Play Now</button>
+<button class="bg-stake-surface border border-stake text-white font-bold px-8 py-2.5 rounded hover:bg-stake-muted/10 transition-all text-sm">Watch Finals</button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 bg-stake-dark border border-stake p-6 rounded-xl flex flex-col">
+<h3 class="text-sm font-bold text-stake-muted uppercase tracking-wider flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-lg">account_circle</span> Session Stats
+            </h3>
+<div class="grid grid-cols-2 gap-3 flex-1">
+<div class="bg-stake-darker p-4 rounded border border-stake">
+<div class="text-[10px] font-bold text-stake-muted uppercase tracking-wider mb-1">Total Wins</div>
+<div class="text-2xl font-bold text-white">142</div>
+</div>
+<div class="bg-stake-darker p-4 rounded border border-stake">
+<div class="text-[10px] font-bold text-stake-muted uppercase tracking-wider mb-1">Win Rate</div>
+<div class="text-2xl font-bold text-primary">84%</div>
+</div>
+<div class="bg-stake-darker p-4 rounded border border-stake">
+<div class="text-[10px] font-bold text-stake-muted uppercase tracking-wider mb-1">Profit</div>
+<div class="text-2xl font-bold text-primary">+2.4 ETH</div>
+</div>
+<div class="bg-stake-darker p-4 rounded border border-stake">
+<div class="text-[10px] font-bold text-stake-muted uppercase tracking-wider mb-1">Rank</div>
+<div class="text-2xl font-bold text-white">#18</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Join Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+<div class="group bg-stake-dark border border-stake p-6 rounded-xl hover:bg-stake-surface transition-colors cursor-pointer relative overflow-hidden">
+<div class="relative z-10">
+<div class="w-full aspect-video rounded bg-stake-darker mb-4 overflow-hidden group-hover:ring-2 ring-primary transition-all">
+<img alt="Dice Duel" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0zZz2Pflp2wNTyVgc1K2SgDrS_5XD8UTrb1HdJzHQ8EDbRJa6hJFlqkrmfu0qOXFA6MJzA2AtSUgBJUZF9gInS6-ASbfwBvAXMPvxkuL4JzcriVtogNeHXZwlU9UtEMuvV0ophhEwKZyHWHufu0DMG5bFqWpLPMBAY3Q3saxrjZ0mFXlndtLD9HdXZ7Mg4sWRRTZ2tOanW0iGyjWLrY4s3I4uEsXowokxd5_0NopkZO17hQNQsQy4AvXmVD3ucPw8yx5QPfWH8cQ"/>
+</div>
+<h4 class="font-bold text-lg mb-1">Dice Duel</h4>
+<p class="text-sm text-stake-muted mb-4">High-speed tactical probability betting.</p>
+<div class="text-xs font-bold text-primary flex items-center gap-1">
+                    Play Dice <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="group bg-stake-dark border border-stake p-6 rounded-xl hover:bg-stake-surface transition-colors cursor-pointer relative overflow-hidden">
+<div class="relative z-10">
+<div class="w-full aspect-video rounded bg-stake-darker mb-4 overflow-hidden group-hover:ring-2 ring-primary transition-all">
+<img alt="Crash PvP" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOlYZ79kKZbjxJrkeR5qlTzCG2YW8f-WrfYUlC7GV0mnTzCkg9OkFWETeM7d6yjFz0B-xLbdzdpePWVOObpHITv_rdUClxxMtKEZ9CWq96FDgkucKWBRmHOxlGLGA7SL0AU_zLYYji1k_9mIe8VKmWxl42_RL-BFnyFnDiSm7al3ghMDanhBsHvpjVl0mLFa3sMWM2hQYfA0eVsIDcUfXscXciVign0bQYAvt0qzc9nqg9_8O4x8TCJvxibTXC5dpz3PPuJ0MxNHk"/>
+</div>
+<h4 class="font-bold text-lg mb-1">Crash PvP</h4>
+<p class="text-sm text-stake-muted mb-4">Test your nerves against global rivals.</p>
+<div class="text-xs font-bold text-primary flex items-center gap-1">
+                    Play Crash <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</div>
+</div>
+</div>
+<div class="group bg-stake-dark border border-stake p-6 rounded-xl hover:bg-stake-surface transition-colors cursor-pointer relative overflow-hidden">
+<div class="relative z-10">
+<div class="w-full aspect-video rounded bg-stake-darker mb-4 overflow-hidden group-hover:ring-2 ring-primary transition-all">
+<img alt="PvP Cards" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCscZTF1qVaBXTICf34uKs1cJm0dXxVkyElkUKe0JnXSF77_4JsX0xVgDAa42ZHK2ne627KBnvgqgENFAkCjZpRfYCznINGHAsb8y3zivSnXDdERAv1t4jyI4vv-Z9XyepJrhwO2535fxng_OQPTR49fx8P-wNtw0xZYF30nyFGV3SBzm5lrGmeTqqlpaSTqGM1ZUZbrPlcbYdhNPX29vIghA2LFYRqHNRYAd-WAbzAXevv8eTcDNoYvQeUhOzY7KQd0WWhe-L1sSY"/>
+</div>
+<h4 class="font-bold text-lg mb-1">PvP Cards</h4>
+<p class="text-sm text-stake-muted mb-4">Strategic deck-based combat wagering.</p>
+<div class="text-xs font-bold text-primary flex items-center gap-1">
+                    Play Cards <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Live Feed and Leaderboard -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Active PvP Feed -->
+<div class="lg:col-span-8 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-white">Live Matches</h3>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+<span class="text-xs font-bold text-stake-muted uppercase tracking-wider">428 Active Fights</span>
+</div>
+</div>
+<div class="space-y-2">
+<!-- Match Entry -->
+<div class="bg-stake-dark border border-stake p-4 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex items-center -space-x-2">
+<img alt="Player 1" class="w-10 h-10 rounded-full border-2 border-stake-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXJqETa3LxkNwhgHBNSfDv3YHVW6JPhvTvTHkFrJLcqn_ndBg9ygKheXODjUWTyKTgeOJDeG5RBtHSqkKdrnQrs9A-umS1pBaDktNTR9tMGzirSLwbk2s8-0my6Iiobf9jSJN8wgycIvHerGusZzWIludhaNDY_I47ExQv1RNYUYxSB90LSMqF1PJ5-Y49S5KI1mpiuosa980lzTZYs7scfuESYeEOGbvIZl4T-lklhNqqWlZVM7pTvvsF2RMhXxY7QwAyTFLXxu4"/>
+<div class="w-8 h-8 rounded-full bg-stake-surface flex items-center justify-center font-bold text-[10px] border-2 border-stake-dark text-stake-muted">VS</div>
+<img alt="Player 2" class="w-10 h-10 rounded-full border-2 border-stake-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUagpwUBSV85H14pK1Q9AN2YsbPQb5H26Z2aWjhGX-_CYuENxAMtP8OBTGX8o0QesK_cncNH8gy0N0eajRS9DVuls547tC5rFZ1JtnAAsCwzmrF4m0BNuZO2dAbroStNOFOBvgLGDNoL1PURXR18xAevi8DMPpBq7MUKqAwMHZBR7Cu7jwEBHnhLGWYO_GWTfUbyMDi1LLQW63KtUzQVtgQrZou5jzhhnjKw3RjBYgnR4dyAfJVX8pNzDZomTKPSRj2CT3iOxNi6s"/>
+</div>
+<div>
+<div class="font-bold text-sm">Viper_X <span class="text-stake-muted font-normal mx-1">vs</span> Ghost09</div>
+<div class="text-[11px] text-stake-muted font-medium">Dice Duel • <span class="text-primary font-bold">0.5 ETH POOL</span></div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<div class="text-[10px] font-bold text-stake-muted uppercase tracking-wider">Remaining</div>
+<div class="text-sm font-mono font-bold text-white">00:42</div>
+</div>
+<button class="bg-stake-surface hover:bg-stake-muted/20 border border-stake px-4 py-1.5 text-xs font-bold rounded transition-all">Spectate</button>
+</div>
+</div>
+<!-- Match Entry -->
+<div class="bg-stake-dark border border-stake p-4 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex items-center -space-x-2">
+<img alt="Player 1" class="w-10 h-10 rounded-full border-2 border-stake-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChUx3AcH_X8sriJhdaHrAJY7eB6oio5Ax0byDp5iaxL6O6b8Nf1ujYnlq06g-FFNeM7OvgvMje4lfpghErIXxQN1gBFJaE22Zgjrd1MH-brFGgIRV_V9v6YqnDm9YwOix_xOY-HZQPW0gq6XRJQ7dFV8IR0WM2BEDtxtkEOhuWs-wz9pd7tCuuUJLyqVdurCRR1lj5JxptecCn_s04pbhb-HZrXBn1xsoAzj79-QYyIf4yiODQYfuq0lrB3cvBoZRnrm86Bo1ffWA"/>
+<div class="w-8 h-8 rounded-full bg-stake-surface flex items-center justify-center font-bold text-[10px] border-2 border-stake-dark text-stake-muted">VS</div>
+<img alt="Player 2" class="w-10 h-10 rounded-full border-2 border-stake-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5XhrxpS3t1InuzzwgV5dPKKMuHYwosiKYIa1GqkMWayaZzAXRyRtAytsm_b1zBOdQVqcBkmOF97RQmBtQT1al0OD7mLC4dtMC3jlkMiKMBR9GIvYZwsMNwU5ZTpUSc90Baw_qUl7WKc0g40UPJS8Mi2K0eIw_pHXBHk0U58XMeeN4BiLxUy5Uyw6WmeZ_-26zQ3T22HwxxEDwOE_sugTYsKGj1JXVSztlbicBF2WGj8uNKFmvrsxp4q6Ynv59kN_x5Pm-JG7Nhzg"/>
+</div>
+<div>
+<div class="font-bold text-sm">Krypto_King <span class="text-stake-muted font-normal mx-1">vs</span> AI_Master</div>
+<div class="text-[11px] text-stake-muted font-medium">Crash PvP • <span class="text-primary font-bold">1.2 ETH POOL</span></div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<div class="text-[10px] font-bold text-stake-muted uppercase tracking-wider">Remaining</div>
+<div class="text-sm font-mono font-bold text-white">01:15</div>
+</div>
+<button class="bg-stake-surface hover:bg-stake-muted/20 border border-stake px-4 py-1.5 text-xs font-bold rounded transition-all">Spectate</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Top Live Wins -->
+<div class="lg:col-span-4 flex flex-col gap-4">
+<h3 class="text-lg font-bold text-white">Top Wins</h3>
+<div class="bg-stake-dark border border-stake rounded-xl overflow-hidden divide-y divide-stake">
+<div class="p-4 flex items-center gap-4 hover:bg-stake-surface transition-colors">
+<span class="font-bold text-stake-muted text-sm w-4">01</span>
+<img alt="Winner" class="w-8 h-8 rounded-full border border-stake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS0z8SOGN6_7BNa0424veLM4BUWaUZ33DSkTZpP8qj1UebShrRFYC5C2CYFVCj-ATTMtlr-kS1R7u0ECMgx1EsU_-fCoSO52XXEGJHrgwY2WetC5aJUVVGUvQJHS0DLRDd9xKxrd-f3DBvrf3TMrPBAwQuh0CgZhjeoy4jGf5ooHeo-1e9ilhMeFyvx65CMC8kvwA5VgdD9ENZCTOK6jmAM_jTOEQaUnIjip6NVBYDrkr1KtBWxDqX4a3KTps0SWnZqGpgd8uM2f0"/>
+<div class="flex-1 min-w-0">
+<div class="text-xs font-bold truncate">CyberWolf_99</div>
+<div class="text-[10px] text-stake-muted uppercase">Dice Duel</div>
+</div>
+<div class="text-primary font-bold text-sm">+0.85 ETH</div>
+</div>
+<div class="p-4 flex items-center gap-4 hover:bg-stake-surface transition-colors">
+<span class="font-bold text-stake-muted text-sm w-4">02</span>
+<img alt="Winner" class="w-8 h-8 rounded-full border border-stake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD247uftuNzEG9EGngIbRGWqCTvz3ZMcMcbg_ZrKUXenx-vedFEayamxVphB5hWqd8Pgzx_iryIJUMrCgzV0ZX_fNPaBol9XMaKmZpf8eNyp0LUDat8oZEz7jNe4d8qVODkTJxBvf5BYspcEOORrFQb9OxJOf-6B2L4Qe81T_qDIjI_JWhvvR1meWT2FLouEjynyCqvrtBoAYE6k9SzWb4lA4U6JNkKdcYefYp1fSk62j8O63dsP1yEfRgFcTDrGELNjipfrl3SzoE"/>
+<div class="flex-1 min-w-0">
+<div class="text-xs font-bold truncate">Zenith_PvP</div>
+<div class="text-[10px] text-stake-muted uppercase">Crash PvP</div>
+</div>
+<div class="text-primary font-bold text-sm">+0.42 ETH</div>
+</div>
+<div class="p-4 flex items-center gap-4 hover:bg-stake-surface transition-colors">
+<span class="font-bold text-stake-muted text-sm w-4">03</span>
+<img alt="Winner" class="w-8 h-8 rounded-full border border-stake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjCBbzZVhN9WL3ClvtAd3pgno6CSZwHpTJA13NkNKlKfQTKutmSJtPo4DoGHpY6awKnHX2FtQ8QRYOP-nySjCcOXeft37DImOOItDyHfm5YyXo2bIjhspi8gP-t10Xh0oluXuFWkAKWXx4wbHk6WrU_l3UEww1qsonFjh2G1eGg8blMLTyZIHueDCArhMkFJ8xeLNQ3e6S89A8p-kOUeQ1SoHPw8ipzuQzeYmI5kEHzzhmGY30vdUsf1G3lJRShBVZZvbq7F6T33Q"/>
+<div class="flex-1 min-w-0">
+<div class="text-xs font-bold truncate">Matrix_Runner</div>
+<div class="text-[10px] text-stake-muted uppercase">Coin Flip</div>
+</div>
+<div class="text-primary font-bold text-sm">+0.38 ETH</div>
+</div>
+</div>
+<button class="w-full py-2.5 text-xs font-bold text-stake-muted hover:text-white transition-colors border border-dashed border-stake rounded-lg">
+                Global History
+            </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Shell (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 md:hidden bg-stake-dark border-t border-stake">
+<a class="flex flex-col items-center justify-center text-primary font-bold text-[10px] uppercase" href="#">
+<span class="material-symbols-outlined mb-1">grid_view</span>
+        Lobby
+    </a>
+<a class="flex flex-col items-center justify-center text-stake-muted font-bold text-[10px] uppercase" href="#">
+<span class="material-symbols-outlined mb-1">sports_esports</span>
+        Games
+    </a>
+<a class="flex flex-col items-center justify-center text-stake-muted font-bold text-[10px] uppercase" href="#">
+<span class="material-symbols-outlined mb-1">history</span>
+        Matches
+    </a>
+<a class="flex flex-col items-center justify-center text-stake-muted font-bold text-[10px] uppercase" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+        Profile
+    </a>
+</nav>
+<!-- Floating Action Button Contextual (FAB) -->
+<button class="fixed bottom-20 right-6 md:bottom-8 md:right-8 w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition-transform z-40 group">
+<span class="material-symbols-outlined font-bold">add</span>
+<span class="absolute right-14 bg-stake-dark px-3 py-1.5 rounded text-[11px] font-bold text-white uppercase opacity-0 group-hover:opacity-100 transition-opacity border border-stake whitespace-nowrap">Create Match</span>
+</button>
+</body></html>
