@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History } from 'lucide-react';
 import { io } from 'socket.io-client';
+import { supabase } from './lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 import Dashboard from './pages/Dashboard.tsx';
 import RankedLobby from './pages/RankedLobby.tsx';
 import Casino from './pages/Casino.tsx';
@@ -9,9 +11,11 @@ import AuthPage from './pages/AuthPage.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
-function Sidebar({ onLogout }: { onLogout: () => void }) {
+function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void }) {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+  const username = session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'Player';
+  const avatarUrl = session.user.user_metadata?.avatar_url;
 
   const links = [
     { path: '/', label: 'Dashboard', icon: Home },
@@ -27,7 +31,7 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
         <Gamepad2 className="w-8 h-8 text-secondary" />
         <h1 className="text-2xl font-display font-bold tracking-wider">HEX<span className="text-primary">BET</span></h1>
       </div>
-      
+
       <nav className="flex-1 p-4 space-y-2">
         {links.map((link) => {
           const Icon = link.icon;
@@ -36,8 +40,8 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
               key={link.path}
               to={link.path}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-                isActive(link.path) 
-                  ? 'bg-white/10 text-white' 
+                isActive(link.path)
+                  ? 'bg-white/10 text-white'
                   : 'text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -50,11 +54,14 @@ function Sidebar({ onLogout }: { onLogout: () => void }) {
 
       <div className="p-4 border-t border-white/10 space-y-2">
         <div className="flex items-center gap-3 p-3 rounded-lg bg-surface/50 border border-white/5">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center">
-            <User className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center overflow-hidden">
+            {avatarUrl
+              ? <img src={avatarUrl} alt={username} className="w-full h-full object-cover" />
+              : <User className="w-5 h-5" />
+            }
           </div>
-          <div>
-            <div className="text-sm font-bold">PlayerOne</div>
+          <div className="min-w-0">
+            <div className="text-sm font-bold truncate">{username}</div>
             <div className="text-xs text-primary font-mono font-medium">Gold Rank</div>
           </div>
         </div>
@@ -81,7 +88,6 @@ function Topbar() {
           <span className="text-sm font-medium text-gray-300">PvP Players: <span className="text-primary">1,402</span></span>
         </div>
       </div>
-      
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
           <div className="text-right">
@@ -95,10 +101,10 @@ function Topbar() {
   );
 }
 
-function AppLayout({ onLogout }: { onLogout: () => void }) {
+function AppLayout({ session, onLogout }: { session: Session; onLogout: () => void }) {
   return (
     <div className="min-h-screen bg-background text-white font-sans">
-      <Sidebar onLogout={onLogout} />
+      <Sidebar session={session} onLogout={onLogout} />
       <Topbar />
       <main className="ml-64 p-8 min-h-[calc(100vh-5rem)]">
         <Routes>
@@ -115,15 +121,50 @@ function AppLayout({ onLogout }: { onLogout: () => void }) {
 }
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!isAuthenticated) {
-    return <AuthPage onAuth={() => setIsAuthenticated(true)} />;
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#07090F] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center animate-pulse">
+            <Gamepad2 className="w-7 h-7 text-white" />
+          </div>
+          <p className="text-gray-500 text-sm">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <AuthPage onAuth={() => {}} />;
   }
 
   return (
     <Router>
-      <AppLayout onLogout={() => setIsAuthenticated(false)} />
+      <AppLayout session={session} onLogout={handleLogout} />
     </Router>
   );
 }
