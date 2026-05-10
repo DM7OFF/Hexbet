@@ -134,7 +134,6 @@ export default function CasinoShells() {
         losses: prev.losses + (won ? 0 : 1),
         totalProfit: prev.totalProfit + profit
       }));
-      setHistoryData(prev => [...prev, { roll: prev.length, profit: prev[prev.length - 1].profit + profit }]);
     }, isFastMode ? 50 : 500);
   };
 

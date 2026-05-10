@@ -109,7 +109,6 @@ export default function CasinoPlinko() {
         losses: prev.losses + (multiplier <= 1 ? 1 : 0),
         totalProfit: prev.totalProfit + profit
       }));
-      setHistoryData(prev => [...prev, { roll: prev.length, profit: prev[prev.length - 1].profit + profit }]);
       setBalls(prev => prev.filter(b => b.id !== ballId));
     }, isFastMode ? 400 : 3000); // 400ms in fast mode vs 3s
   };
