@@ -4,6 +4,7 @@ import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useBalance } from '../context/BalanceContext.tsx';
+import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function CasinoShells() {
   const { balance, updateBalance, getMaxGain, recordWager } = useBalance();
@@ -143,6 +144,11 @@ export default function CasinoShells() {
     setGameState('idle');
     setWinningIndex(null);
     setSelectedIndex(null);
+  };
+
+  const resetStats = () => {
+    setStats({ wins: 0, losses: 0, totalProfit: 0 });
+    setHistoryData([{ roll: 0, profit: 0 }]);
   };
 
   return (
@@ -367,48 +373,10 @@ export default function CasinoShells() {
             </AnimatePresence>
           </div>
 
-          {/* Stats & History */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="glass-panel p-6 rounded-2xl">
-              <h3 className="font-bold flex items-center gap-2 text-gray-300 mb-4">
-                <BarChart2 className="w-5 h-5 text-primary" /> Session Stats
-              </h3>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="p-3 rounded-xl bg-surface/30 border border-white/5">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase">Wins</div>
-                  <div className="text-xl font-mono font-bold text-success">{stats.wins}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-surface/30 border border-white/5">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase">Losses</div>
-                  <div className="text-xl font-mono font-bold text-danger">{stats.losses}</div>
-                </div>
-                <div className="p-3 rounded-xl bg-surface/30 border border-white/5">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase">Profit</div>
-                  <div className={`text-xl font-mono font-bold ${stats.totalProfit >= 0 ? 'text-success' : 'text-danger'}`}>
-                    {stats.totalProfit.toFixed(2)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-panel p-6 rounded-2xl h-40">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={historyData}>
-                  <defs>
-                    <linearGradient id="colorProfitShells" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ff2a5f" stopOpacity={0.5}/>
-                      <stop offset="95%" stopColor="#ff2a5f" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis hide dataKey="roll" />
-                  <YAxis hide />
-                  <Area type="monotone" dataKey="profit" stroke="#ff2a5f" fill="url(#colorProfitShells)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
           </div>
         </div>
       </div>
+      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }

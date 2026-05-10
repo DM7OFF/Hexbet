@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, Trophy, RotateCcw } from 'lucide-react';
+import { Wallet, Coins, Trophy, RotateCcw, BarChart2 } from 'lucide-react';
+import StatsFloater from '../components/StatsFloater.tsx';
 
 type Card = {
   suit: string;
@@ -24,6 +25,7 @@ export default function Blackjack() {
   const [gameState, setGameState] = useState<'betting' | 'playing' | 'dealer_turn' | 'end'>('betting');
   const [message, setMessage] = useState('');
   const [gameResult, setGameResult] = useState<'win' | 'loss' | 'draw' | null>(null);
+  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
 
   const createDeck = () => {
     let newDeck: Card[] = [];
@@ -116,10 +118,15 @@ export default function Blackjack() {
     if (result === 'win') {
       const winAmount = Math.min(betAmount * 2, getMaxGain());
       updateBalance(winAmount);
+      setStats(prev => ({ ...prev, wins: prev.wins + 1, totalProfit: prev.totalProfit + (winAmount - betAmount) }));
     } else if (result === 'draw') {
       updateBalance(betAmount);
+    } else {
+      setStats(prev => ({ ...prev, losses: prev.losses + 1, totalProfit: prev.totalProfit - betAmount }));
     }
   };
+
+  const resetStats = () => setStats({ wins: 0, losses: 0, totalProfit: 0 });
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
@@ -282,6 +289,7 @@ export default function Blackjack() {
           </div>
         </div>
       </div>
+      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }

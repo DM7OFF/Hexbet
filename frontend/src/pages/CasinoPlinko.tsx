@@ -31,6 +31,7 @@ interface Ball {
 }
 
 import { useBalance } from '../context/BalanceContext.tsx';
+import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function CasinoPlinko() {
   const { balance, updateBalance, getMaxGain, recordWager } = useBalance();
@@ -48,6 +49,10 @@ export default function CasinoPlinko() {
   const [risk, setRisk] = useState<'low' | 'med' | 'high'>('med');
   const [balls, setBalls] = useState<Ball[]>([]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
+  
+  const resetStats = () => {
+    setStats({ wins: 0, losses: 0, totalProfit: 0 });
+  };
   const [historyData, setHistoryData] = useState<{ roll: number; profit: number }[]>([{ roll: 0, profit: 0 }]);
   
   // Auto Mode
@@ -274,55 +279,9 @@ export default function CasinoPlinko() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Stats */}
-            <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
-              <h3 className="font-bold flex items-center gap-2 text-gray-300 mb-4">
-                <BarChart2 className="w-5 h-5 text-secondary" /> Statistics
-              </h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-surface/30 p-3 rounded-xl border border-white/5 text-center">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase">Profit</div>
-                  <div className={`text-xl font-mono font-bold ${stats.totalProfit >= 0 ? 'text-success' : 'text-danger'}`}>
-                    {stats.totalProfit.toFixed(2)}
-                  </div>
-                </div>
-                <div className="bg-surface/30 p-3 rounded-xl border border-white/5 text-center">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase">Wins</div>
-                  <div className="text-xl font-mono font-bold text-success">{stats.wins}</div>
-                </div>
-                <div className="bg-surface/30 p-3 rounded-xl border border-white/5 text-center">
-                  <div className="text-[10px] text-gray-500 font-bold uppercase">Losses</div>
-                  <div className="text-xl font-mono font-bold text-danger">{stats.losses}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* History Graph */}
-            <div className="glass-panel p-6 rounded-2xl">
-              <div className="h-32 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={historyData}>
-                    <defs>
-                      <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#00f0ff" stopOpacity={0.5}/>
-                        <stop offset="95%" stopColor="#00f0ff" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis hide dataKey="roll" />
-                    <YAxis hide />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1a1b26', border: 'none', borderRadius: '8px' }}
-                      itemStyle={{ color: '#00f0ff' }}
-                    />
-                    <Area type="monotone" dataKey="profit" stroke="#00f0ff" fill="url(#colorProfit)" strokeWidth={2} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
+      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }

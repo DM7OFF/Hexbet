@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, History, AlertCircle } from 'lucide-react';
+import { Wallet, Coins, History, AlertCircle, BarChart2 } from 'lucide-react';
+import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function Crash() {
   const { balance, updateBalance, recordWager, getMaxGain } = useBalance();
@@ -12,6 +13,7 @@ export default function Crash() {
   const [crashPoint, setCrashPoint] = useState(0);
   const gameLoopRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
+  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
 
   const startNextGame = () => {
     if (betAmount > balance) return;
@@ -37,6 +39,7 @@ export default function Crash() {
     if (currentMult >= crashPoint) {
       setGameState('crashed');
       setHistory(prev => [parseFloat(crashPoint.toFixed(2)), ...prev].slice(0, 15));
+      setStats(prev => ({ ...prev, losses: prev.losses + 1, totalProfit: prev.totalProfit - betAmount }));
       cancelAnimationFrame(gameLoopRef.current!);
       return;
     }
@@ -54,7 +57,10 @@ export default function Crash() {
     
     const winAmount = Math.min(betAmount * currentMult, getMaxGain());
     updateBalance(winAmount);
+    setStats(prev => ({ ...prev, wins: prev.wins + 1, totalProfit: prev.totalProfit + (winAmount - betAmount) }));
   };
+
+  const resetStats = () => setStats({ wins: 0, losses: 0, totalProfit: 0 });
 
   useEffect(() => {
     return () => cancelAnimationFrame(gameLoopRef.current!);
@@ -191,6 +197,7 @@ export default function Crash() {
           </div>
         </div>
       </div>
+      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }
