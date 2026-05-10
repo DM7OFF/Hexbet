@@ -137,7 +137,6 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
       {children}
     </BalanceContext.Provider>
   );
-  );
 }
 
 export function useBalance() {
