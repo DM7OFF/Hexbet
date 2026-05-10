@@ -22,11 +22,15 @@ export default function CasinoShells() {
   const [currentAutoCount, setCurrentAutoCount] = useState(0);
   const [stopOnProfit, setStopOnProfit] = useState<number>(0);
   const [stopOnLoss, setStopOnLoss] = useState<number>(0);
-  const [autoPickStrategy, setAutoPickStrategy] = useState<'random' | 'fixed'>('random');
+  const [autoPickStrategy, setAutoPickStrategy] = useState<'random' | number>('random');
 
   useEffect(() => {
     setCups(Array.from({ length: cupsCount }, (_, i) => i));
-  }, [cupsCount]);
+    // Reset strategy if current fixed cup is out of bounds
+    if (typeof autoPickStrategy === 'number' && autoPickStrategy >= cupsCount) {
+      setAutoPickStrategy('random');
+    }
+  }, [cupsCount, autoPickStrategy]);
 
   // Auto Mode Logic
   useEffect(() => {
@@ -58,7 +62,7 @@ export default function CasinoShells() {
     if (autoRunning && gameState === 'picking') {
       const pickIndex = autoPickStrategy === 'random' 
         ? Math.floor(Math.random() * cupsCount)
-        : 0;
+        : autoPickStrategy;
       
       setTimeout(() => handlePick(pickIndex), 1000);
     }
@@ -186,19 +190,22 @@ export default function CasinoShells() {
               <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-300">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pick Strategy</label>
-                  <div className="flex bg-surface rounded-lg p-1 border border-white/10">
+                  <div className="grid grid-cols-2 gap-2 bg-surface rounded-lg p-1 border border-white/10">
                     <button 
                       onClick={() => setAutoPickStrategy('random')} 
-                      className={`flex-1 py-1.5 rounded text-[10px] font-bold transition-all ${autoPickStrategy === 'random' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
+                      className={`py-1.5 rounded text-[10px] font-bold transition-all ${autoPickStrategy === 'random' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
                     >
                       Random
                     </button>
-                    <button 
-                      onClick={() => setAutoPickStrategy('fixed')} 
-                      className={`flex-1 py-1.5 rounded text-[10px] font-bold transition-all ${autoPickStrategy === 'fixed' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
-                    >
-                      Cup 1
-                    </button>
+                    {Array.from({ length: cupsCount }, (_, i) => (
+                      <button 
+                        key={i}
+                        onClick={() => setAutoPickStrategy(i as any)} 
+                        className={`py-1.5 rounded text-[10px] font-bold transition-all ${autoPickStrategy === i ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
+                      >
+                        Cup {i + 1}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
