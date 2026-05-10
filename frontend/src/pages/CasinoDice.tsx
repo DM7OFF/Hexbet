@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Dice5, Trophy, RefreshCw, BarChart2, Play, Square } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function CasinoDice() {
   const [betAmount, setBetAmount] = useState<number>(10);
@@ -8,6 +9,7 @@ export default function CasinoDice() {
   const [lastRoll, setLastRoll] = useState<{ result: number; won: boolean; profit: number } | null>(null);
 
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
+  const [historyData, setHistoryData] = useState<{ roll: number; profit: number }[]>([{ roll: 0, profit: 0 }]);
 
   // Auto Mode State
   const [isAuto, setIsAuto] = useState(false);
@@ -74,6 +76,8 @@ export default function CasinoDice() {
         losses: prev.losses + (won ? 0 : 1),
         totalProfit: prev.totalProfit + profit
       }));
+      
+      setHistoryData(prev => [...prev, { roll: prev.length, profit: prev[prev.length - 1].profit + profit }]);
       
       setRolling(false);
     }, 600);
@@ -318,6 +322,34 @@ export default function CasinoDice() {
                   {stats.totalProfit > 0 ? '+' : ''}{stats.totalProfit.toFixed(2)}
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Chart Panel */}
+          <div className="glass-panel p-6 rounded-2xl animate-in slide-in-from-bottom-4 mt-6">
+            <h3 className="font-bold font-display text-lg mb-4 flex items-center gap-2 text-gray-300">
+              <BarChart2 className="w-5 h-5 text-secondary" />
+              Profit History
+            </h3>
+            <div className="h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={historyData}>
+                  <defs>
+                    <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00f0ff" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#00f0ff" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="roll" stroke="#ffffff33" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#ffffff33" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => value.toFixed(0)} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1a1b26', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                    itemStyle={{ color: '#00f0ff', fontWeight: 'bold' }}
+                    labelStyle={{ color: '#888' }}
+                  />
+                  <Area type="monotone" dataKey="profit" stroke="#00f0ff" fillOpacity={1} fill="url(#colorProfit)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
