@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Swords, Trophy, User, CheckCircle2 } from 'lucide-react';
+import { Swords, User, CheckCircle2 } from 'lucide-react';
 
 export default function PvPDice() {
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'finished'>('waiting');

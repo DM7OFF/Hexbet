@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dice5, Trophy, TrendingUp, AlertCircle, RefreshCw } from 'lucide-react';
+import { Dice5, Trophy, RefreshCw } from 'lucide-react';
 
 export default function CasinoDice() {
   const [betAmount, setBetAmount] = useState<number>(10);
