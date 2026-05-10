@@ -11,6 +11,7 @@ interface Player {
 const queue: Player[] = [];
 const activeMatches: Record<string, { p1: Player; p2: Player; gameType: string; stake: number; winnerId?: string; state?: string; newStake?: number }> = {};
 const matchRolls: Record<string, { p1Roll?: number; p2Roll?: number }> = {};
+const matchPicks: Record<string, { p1Pick?: number; p2Pick?: number }> = {};
 
 export function setupMatchmaking(io: Server) {
   io.on('connection', (socket: Socket) => {
@@ -75,6 +76,47 @@ export function setupMatchmaking(io: Server) {
       }
     });
 
+    socket.on('submit_pick', (data: { matchId: string; pick: number }) => {
+      const match = activeMatches[data.matchId];
+      if (!match) return;
+
+      if (!matchPicks[data.matchId]) {
+        matchPicks[data.matchId] = {};
+      }
+
+      if (match.p1.socketId === socket.id) matchPicks[data.matchId].p1Pick = data.pick;
+      else if (match.p2.socketId === socket.id) matchPicks[data.matchId].p2Pick = data.pick;
+
+      socket.to(data.matchId).emit('opponent_picked');
+
+      const picks = matchPicks[data.matchId];
+
+      if (picks.p1Pick !== undefined && picks.p2Pick !== undefined) {
+        // Evaluate
+        const winningCup = Math.floor(Math.random() * 3); // Base 3 cups for now
+        const p1Right = picks.p1Pick === winningCup;
+        const p2Right = picks.p2Pick === winningCup;
+        
+        let winnerId: string;
+        if (p1Right && !p2Right) winnerId = match.p1.userId;
+        else if (!p1Right && p2Right) winnerId = match.p2.userId;
+        else winnerId = 'draw';
+
+        match.winnerId = winnerId;
+        match.state = 'rematch_phase';
+
+        setTimeout(() => {
+          io.to(data.matchId).emit('match_result', {
+            p1: { userId: match.p1.userId, socketId: match.p1.socketId, pick: picks.p1Pick },
+            p2: { userId: match.p2.userId, socketId: match.p2.socketId, pick: picks.p2Pick },
+            winningCup,
+            winnerId
+          });
+          delete matchPicks[data.matchId];
+        }, 1000);
+      }
+    });
+
     socket.on('propose_rematch', (data: { matchId: string; newStake: number }) => {
       const match = activeMatches[data.matchId];
       if (!match) return;
@@ -110,6 +152,7 @@ export function setupMatchmaking(io: Server) {
       io.to(matchId).emit('match_ended');
       delete activeMatches[matchId];
       delete matchRolls[matchId];
+      delete matchPicks[matchId];
     });
 
     socket.on('disconnect', () => {

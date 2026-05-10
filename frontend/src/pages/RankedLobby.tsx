@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Swords, Zap, Shield, Users } from 'lucide-react';
+import { Trophy, Swords, Zap, Shield, Users, Dice5, Target } from 'lucide-react';
 import { socket } from '../App';
 
 const GAMES = [
   { id: 'crash', name: 'Crash PvP', icon: Zap, desc: 'Hold your nerve. Last one to cash out before the crash wins the pot.', players: 452 },
-  { id: 'dice', name: 'Dice Duel', icon: Trophy, desc: 'Comparative risk system. Roll higher or predict better than your opponent.', players: 891 },
+  { id: 'dice', name: 'Dice Duel', icon: Dice5, desc: 'Comparative risk system. Roll higher or predict better than your opponent.', players: 891 },
+  { id: 'shell', name: 'Shell Duel', icon: Target, desc: 'Follow the prize. Strategy meets intuition in this high-speed game.', players: 215 },
   { id: 'cards', name: 'Card Battle', icon: Swords, desc: 'High-stakes card mechanics. Strategy meets luck in intense 1v1s.', players: 320 },
 ];
 
@@ -21,6 +22,8 @@ export default function RankedLobby() {
       setIsSearching(false);
       if (selectedGame === 'dice') {
         navigate(`/ranked/dice/${data.matchId}`);
+      } else if (selectedGame === 'shell') {
+        navigate(`/ranked/shell/${data.matchId}`);
       } else {
         alert("Match found! Joining game...");
       }
