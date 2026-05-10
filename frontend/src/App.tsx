@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { BalanceProvider, useBalance } from './context/BalanceContext.tsx';
-import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History, Zap, Coins, Search, Bell, ChevronDown } from 'lucide-react';
+import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History, Zap, Coins } from 'lucide-react';
 import { io } from 'socket.io-client';
 import type { Session } from '@supabase/supabase-js';
 import Dashboard from './pages/Dashboard.tsx';
