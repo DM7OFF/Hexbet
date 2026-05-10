@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trophy, BarChart2, RefreshCw } from 'lucide-react';
+import { Trophy, BarChart2, RefreshCw, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -23,6 +23,7 @@ export default function CasinoShells() {
   const [stopOnProfit, setStopOnProfit] = useState<number>(0);
   const [stopOnLoss, setStopOnLoss] = useState<number>(0);
   const [autoPickStrategy, setAutoPickStrategy] = useState<'random' | number>('random');
+  const [isFastMode, setIsFastMode] = useState(false);
 
   useEffect(() => {
     setCups(Array.from({ length: cupsCount }, (_, i) => i));
@@ -52,10 +53,10 @@ export default function CasinoShells() {
       timeout = setTimeout(() => {
         startShuffle();
         setCurrentAutoCount(prev => prev + 1);
-      }, 500);
+      }, isFastMode ? 100 : 500);
     }
     return () => clearTimeout(timeout);
-  }, [autoRunning, gameState, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss]);
+  }, [autoRunning, gameState, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss, isFastMode]);
 
   // Auto Pick Logic
   useEffect(() => {
@@ -64,16 +65,16 @@ export default function CasinoShells() {
         ? Math.floor(Math.random() * cupsCount)
         : autoPickStrategy;
       
-      setTimeout(() => handlePick(pickIndex), 1000);
+      setTimeout(() => handlePick(pickIndex), isFastMode ? 100 : 1000);
     }
-  }, [autoRunning, gameState, autoPickStrategy, cupsCount]);
+  }, [autoRunning, gameState, autoPickStrategy, cupsCount, isFastMode]);
 
   // Auto Reset Logic
   useEffect(() => {
     if (autoRunning && gameState === 'revealing') {
-      setTimeout(() => reset(), 2000);
+      setTimeout(() => reset(), isFastMode ? 200 : 2000);
     }
-  }, [autoRunning, gameState]);
+  }, [autoRunning, gameState, isFastMode]);
 
   const multiplier = cupsCount * (1 - HOUSE_EDGE / 100);
   const potentialProfit = betAmount * multiplier - betAmount;
@@ -93,7 +94,7 @@ export default function CasinoShells() {
       
       setWinningIndex(realWinningIndex);
       setGameState('picking');
-    }, 2000);
+    }, isFastMode ? 100 : 2000);
   };
 
   const handlePick = (index: number) => {
@@ -111,7 +112,7 @@ export default function CasinoShells() {
         totalProfit: prev.totalProfit + profit
       }));
       setHistoryData(prev => [...prev, { roll: prev.length, profit: prev[prev.length - 1].profit + profit }]);
-    }, 500);
+    }, isFastMode ? 50 : 500);
   };
 
   const reset = () => {
@@ -137,18 +138,27 @@ export default function CasinoShells() {
         <div className="lg:col-span-1 space-y-6">
           <div className="glass-panel p-6 rounded-2xl space-y-6">
             {/* Auto / Manual Toggle */}
-            <div className="flex bg-surface rounded-lg p-1 border border-white/10">
+            <div className="flex items-center gap-4">
+              <div className="flex-1 flex bg-surface rounded-lg p-1 border border-white/10">
+                <button 
+                  onClick={() => setIsAuto(false)} 
+                  className={`flex-1 py-2 rounded text-sm font-bold transition-all ${!isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Manual
+                </button>
+                <button 
+                  onClick={() => { setIsAuto(true); setAutoRunning(false); setCurrentAutoCount(0); }} 
+                  className={`flex-1 py-2 rounded text-sm font-bold transition-all ${isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Auto
+                </button>
+              </div>
               <button 
-                onClick={() => setIsAuto(false)} 
-                className={`flex-1 py-2 rounded text-sm font-bold transition-all ${!isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                onClick={() => setIsFastMode(!isFastMode)}
+                className={`p-2 rounded-lg border transition-all ${isFastMode ? 'bg-warning/20 border-warning text-warning' : 'bg-surface border-white/10 text-gray-500'}`}
+                title="Fast Mode"
               >
-                Manual
-              </button>
-              <button 
-                onClick={() => { setIsAuto(true); setAutoRunning(false); setCurrentAutoCount(0); }} 
-                className={`flex-1 py-2 rounded text-sm font-bold transition-all ${isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
-              >
-                Auto
+                <Zap className={`w-5 h-5 ${isFastMode ? 'fill-current' : ''}`} />
               </button>
             </div>
 

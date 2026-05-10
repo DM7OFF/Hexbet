@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dice5, Trophy, RefreshCw, BarChart2, Play, Square } from 'lucide-react';
+import { Dice5, Trophy, RefreshCw, BarChart2, Play, Square, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function CasinoDice() {
@@ -18,6 +18,7 @@ export default function CasinoDice() {
   const [currentAutoCount, setCurrentAutoCount] = useState(0);
   const [stopOnProfit, setStopOnProfit] = useState<number>(0);
   const [stopOnLoss, setStopOnLoss] = useState<number>(0);
+  const [isFastMode, setIsFastMode] = useState(false);
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -38,10 +39,10 @@ export default function CasinoDice() {
       timeout = setTimeout(() => {
         handleRoll();
         setCurrentAutoCount(prev => prev + 1);
-      }, 300); // 300ms delay between auto rolls
+      }, isFastMode ? 50 : 300); // Much faster delay in fast mode
     }
     return () => clearTimeout(timeout);
-  }, [autoRunning, rolling, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss]);
+  }, [autoRunning, rolling, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss, isFastMode]);
 
   // Constants
   const HOUSE_EDGE = 1.5; // Adjusted to 1.5% as requested
@@ -80,7 +81,7 @@ export default function CasinoDice() {
       setHistoryData(prev => [...prev, { roll: prev.length, profit: prev[prev.length - 1].profit + profit }]);
       
       setRolling(false);
-    }, 600);
+    }, isFastMode ? 50 : 600); // 50ms in fast mode vs 600ms normal
   };
 
   return (
@@ -102,18 +103,27 @@ export default function CasinoDice() {
           <div className="glass-panel p-6 rounded-2xl space-y-6">
             
             {/* Auto / Manual Toggle */}
-            <div className="flex bg-surface rounded-lg p-1 border border-white/10 mb-4">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-1 flex bg-surface rounded-lg p-1 border border-white/10">
+                <button 
+                  onClick={() => setIsAuto(false)} 
+                  className={`flex-1 py-2 rounded text-sm font-bold transition-all ${!isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Manual
+                </button>
+                <button 
+                  onClick={() => { setIsAuto(true); setAutoRunning(false); setCurrentAutoCount(0); }} 
+                  className={`flex-1 py-2 rounded text-sm font-bold transition-all ${isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                >
+                  Auto
+                </button>
+              </div>
               <button 
-                onClick={() => setIsAuto(false)} 
-                className={`flex-1 py-2 rounded text-sm font-bold transition-all ${!isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+                onClick={() => setIsFastMode(!isFastMode)}
+                className={`p-2 rounded-lg border transition-all ${isFastMode ? 'bg-warning/20 border-warning text-warning' : 'bg-surface border-white/10 text-gray-500'}`}
+                title="Fast Mode"
               >
-                Manual
-              </button>
-              <button 
-                onClick={() => { setIsAuto(true); setAutoRunning(false); setCurrentAutoCount(0); }} 
-                className={`flex-1 py-2 rounded text-sm font-bold transition-all ${isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
-              >
-                Auto
+                <Zap className={`w-5 h-5 ${isFastMode ? 'fill-current' : ''}`} />
               </button>
             </div>
 

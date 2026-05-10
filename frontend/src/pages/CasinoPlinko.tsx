@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Coins, BarChart2, Play, Square } from 'lucide-react';
+import { Coins, BarChart2, Play, Square, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -41,6 +41,7 @@ export default function CasinoPlinko() {
   // Auto Mode
   const [isAuto, setIsAuto] = useState(false);
   const [autoRunning, setAutoRunning] = useState(false);
+  const [isFastMode, setIsFastMode] = useState(false);
   const autoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const multipliers = MULTIPLIERS[rows][risk];
@@ -90,21 +91,21 @@ export default function CasinoPlinko() {
       }));
       setHistoryData(prev => [...prev, { roll: prev.length, profit: prev[prev.length - 1].profit + profit }]);
       setBalls(prev => prev.filter(b => b.id !== ballId));
-    }, 3000); // 3s animation
+    }, isFastMode ? 400 : 3000); // 400ms in fast mode vs 3s
   };
 
   useEffect(() => {
     if (autoRunning) {
       autoTimeoutRef.current = setTimeout(() => {
         handleDrop();
-      }, 500);
+      }, isFastMode ? 100 : 500);
     } else if (autoTimeoutRef.current) {
       clearTimeout(autoTimeoutRef.current);
     }
     return () => {
       if (autoTimeoutRef.current) clearTimeout(autoTimeoutRef.current);
     };
-  }, [autoRunning, balls.length]);
+  }, [autoRunning, balls.length, isFastMode]);
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -122,9 +123,18 @@ export default function CasinoPlinko() {
         {/* Controls */}
         <div className="lg:col-span-1 space-y-6">
           <div className="glass-panel p-6 rounded-2xl space-y-6">
-            <div className="flex bg-surface rounded-lg p-1 border border-white/10">
-              <button onClick={() => setIsAuto(false)} className={`flex-1 py-2 rounded text-sm font-bold transition-all ${!isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400'}`}>Manual</button>
-              <button onClick={() => setIsAuto(true)} className={`flex-1 py-2 rounded text-sm font-bold transition-all ${isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400'}`}>Auto</button>
+            <div className="flex items-center gap-4">
+              <div className="flex-1 flex bg-surface rounded-lg p-1 border border-white/10">
+                <button onClick={() => setIsAuto(false)} className={`flex-1 py-2 rounded text-sm font-bold transition-all ${!isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400'}`}>Manual</button>
+                <button onClick={() => setIsAuto(true)} className={`flex-1 py-2 rounded text-sm font-bold transition-all ${isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400'}`}>Auto</button>
+              </div>
+              <button 
+                onClick={() => setIsFastMode(!isFastMode)}
+                className={`p-2 rounded-lg border transition-all ${isFastMode ? 'bg-warning/20 border-warning text-warning' : 'bg-surface border-white/10 text-gray-500'}`}
+                title="Fast Mode"
+              >
+                <Zap className={`w-5 h-5 ${isFastMode ? 'fill-current' : ''}`} />
+              </button>
             </div>
 
             <div className="space-y-2">
@@ -214,7 +224,7 @@ export default function CasinoPlinko() {
                       cy: ball.path.map(p => p.y)
                     }}
                     transition={{
-                      duration: 3,
+                      duration: isFastMode ? 0.4 : 3,
                       ease: "linear",
                       times: ball.path.map((_, i) => i / ball.path.length)
                     }}
