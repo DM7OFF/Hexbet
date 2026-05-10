@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dice5, Zap, Swords, Coins, Play, Trophy, Spade } from 'lucide-react';
+import { Dice5, Zap, Swords, Coins, Trophy, Spade } from 'lucide-react';
 
 const CASINO_GAMES = [
   { id: 'crash', name: 'House Crash', icon: Zap, desc: 'Classic crash. Multiply your crypto instantly.', houseEdge: '1%' },
