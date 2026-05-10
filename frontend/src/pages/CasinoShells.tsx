@@ -3,8 +3,19 @@ import { Trophy, BarChart2, RefreshCw, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { useBalance } from '../context/BalanceContext.tsx';
+
 export default function CasinoShells() {
+  const { balance, updateBalance } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
+
+  // Auto-adjust bet amount if it exceeds balance
+  useEffect(() => {
+    if (betAmount > balance) {
+      setBetAmount(Math.max(0, balance));
+    }
+  }, [balance, betAmount]);
+
   const [cupsCount, setCupsCount] = useState<number>(3);
   const [gameState, setGameState] = useState<'idle' | 'shuffling' | 'picking' | 'revealing'>('idle');
   const [winningIndex, setWinningIndex] = useState<number | null>(null);
@@ -81,10 +92,11 @@ export default function CasinoShells() {
   const potentialProfit = Math.min(betAmount * multiplier - betAmount, MAX_GAIN);
 
   const startShuffle = () => {
-    if (betAmount <= 0) return;
+    if (betAmount <= 0 || betAmount > balance) return;
     setGameState('shuffling');
     setWinningIndex(null);
     setSelectedIndex(null);
+    updateBalance(-betAmount); // Deduct stake
 
     // Shuffle logic with extra randomization to ensure no bias
     setTimeout(() => {
@@ -113,6 +125,10 @@ export default function CasinoShells() {
     const profit = won ? potentialProfit : -betAmount;
 
     setTimeout(() => {
+      if (won) {
+        updateBalance(betAmount + potentialProfit); // Return stake + profit
+      }
+
       setStats(prev => ({
         wins: prev.wins + (won ? 1 : 0),
         losses: prev.losses + (won ? 0 : 1),

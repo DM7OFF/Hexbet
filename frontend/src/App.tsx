@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { BalanceProvider, useBalance } from './context/BalanceContext.tsx';
 import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History } from 'lucide-react';
 import { io } from 'socket.io-client';
 import type { Session } from '@supabase/supabase-js';
@@ -79,6 +80,8 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
 }
 
 function Topbar() {
+  const { balance } = useBalance();
+  
   return (
     <header className="h-20 ml-64 flex items-center justify-between px-8 border-b border-white/10 glass-panel sticky top-0 z-40">
       <div className="flex items-center gap-4">
@@ -94,7 +97,7 @@ function Topbar() {
         <div className="flex items-center gap-3">
           <div className="text-right">
             <div className="text-xs text-gray-400">Balance</div>
-            <div className="text-lg font-mono font-bold text-success">2.450 ETH</div>
+            <div className="text-lg font-mono font-bold text-success">{balance.toFixed(2)} COINS</div>
           </div>
           <button className="btn-primary py-2 px-4 text-sm">Deposit</button>
         </div>
@@ -137,9 +140,11 @@ function App() {
   } as any;
 
   return (
-    <Router>
-      <AppLayout session={mockSession} onLogout={() => alert("L'authentification est temporairement désactivée")} />
-    </Router>
+    <BalanceProvider>
+      <Router>
+        <AppLayout session={mockSession} onLogout={() => alert("L'authentification est temporairement désactivée")} />
+      </Router>
+    </BalanceProvider>
   );
 }
 

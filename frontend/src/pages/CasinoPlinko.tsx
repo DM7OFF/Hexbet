@@ -30,8 +30,19 @@ interface Ball {
   multiplier: number;
 }
 
+import { useBalance } from '../context/BalanceContext.tsx';
+
 export default function CasinoPlinko() {
+  const { balance, updateBalance } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
+
+  // Auto-adjust bet amount if it exceeds balance
+  useEffect(() => {
+    if (betAmount > balance) {
+      setBetAmount(Math.max(0, balance));
+    }
+  }, [balance, betAmount]);
+
   const [rows, setRows] = useState<number>(8);
   const [risk, setRisk] = useState<'low' | 'med' | 'high'>('med');
   const [balls, setBalls] = useState<Ball[]>([]);
@@ -47,9 +58,10 @@ export default function CasinoPlinko() {
   const multipliers = MULTIPLIERS[rows][risk];
 
   const handleDrop = () => {
-    if (betAmount <= 0) return;
+    if (betAmount <= 0 || betAmount > balance) return;
 
     const ballId = Math.random().toString(36).substr(2, 9);
+    updateBalance(-betAmount); // Deduct stake
     
     // Generate Path
     let currentIndex = 0;
@@ -86,6 +98,8 @@ export default function CasinoPlinko() {
 
     // Update stats after animation
     setTimeout(() => {
+      updateBalance(actualPayout); // Add payout to global balance
+
       setStats(prev => ({
         wins: prev.wins + (multiplier > 1 ? 1 : 0),
         losses: prev.losses + (multiplier <= 1 ? 1 : 0),

@@ -2,8 +2,19 @@ import { useState, useEffect } from 'react';
 import { Dice5, Trophy, RefreshCw, BarChart2, Play, Square, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
+import { useBalance } from '../context/BalanceContext.tsx';
+
 export default function CasinoDice() {
+  const { balance, updateBalance } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
+
+  // Auto-adjust bet amount if it exceeds balance
+  useEffect(() => {
+    if (betAmount > balance) {
+      setBetAmount(Math.max(0, balance));
+    }
+  }, [balance, betAmount]);
+
   const [winChance, setWinChance] = useState<number>(50);
   const [rolling, setRolling] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ result: number; won: boolean; profit: number } | null>(null);
@@ -57,16 +68,21 @@ export default function CasinoDice() {
   const rollUnder = winChance;
 
   const handleRoll = () => {
-    if (betAmount <= 0) return;
+    if (betAmount <= 0 || betAmount > balance) return;
     
     setRolling(true);
     setLastRoll(null);
+    updateBalance(-betAmount); // Deduct stake
 
     // Simulate network delay and RNG
     setTimeout(() => {
       const result = parseFloat((Math.random() * 100).toFixed(2));
       const won = result < rollUnder;
       const profit = won ? actualProfit : -betAmount;
+      
+      if (won) {
+        updateBalance(betAmount + actualProfit); // Return stake + profit
+      }
       
       setLastRoll({
         result,
