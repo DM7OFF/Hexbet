@@ -3,8 +3,6 @@ import { Trophy, BarChart2, RefreshCw, Zap } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const HOUSE_EDGE = 3.0; // Increased house edge to lower multipliers and increase casino profit
-
 export default function CasinoShells() {
   const [betAmount, setBetAmount] = useState<number>(10);
   const [cupsCount, setCupsCount] = useState<number>(3);
@@ -77,8 +75,10 @@ export default function CasinoShells() {
     }
   }, [autoRunning, gameState, isFastMode]);
 
+  const HOUSE_EDGE = 1.5;
+  const MAX_GAIN = 10000; // Maximum profit allowed per bet
   const multiplier = cupsCount * (1 - HOUSE_EDGE / 100);
-  const potentialProfit = betAmount * multiplier - betAmount;
+  const potentialProfit = Math.min(betAmount * multiplier - betAmount, MAX_GAIN);
 
   const startShuffle = () => {
     if (betAmount <= 0) return;
@@ -245,8 +245,11 @@ export default function CasinoShells() {
             )}
 
             <div className="p-4 bg-surface/50 rounded-xl border border-white/5 space-y-1">
-              <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Potential Win</div>
-              <div className="text-xl font-mono font-bold text-success">{(betAmount * multiplier).toFixed(2)} COINS</div>
+              <div className="flex justify-between items-center">
+                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Potential Win</div>
+                <div className="text-[8px] text-warning font-bold uppercase tracking-widest">Max Gain: {MAX_GAIN}</div>
+              </div>
+              <div className="text-xl font-mono font-bold text-success">{Math.min(betAmount * multiplier, betAmount + MAX_GAIN).toFixed(2)} COINS</div>
               <div className="text-xs text-gray-400">{multiplier.toFixed(2)}x Multiplier</div>
             </div>
 

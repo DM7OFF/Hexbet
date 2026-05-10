@@ -48,10 +48,12 @@ export default function CasinoDice() {
   const HOUSE_EDGE = 1.5; // Adjusted to 1.5% as requested
   const MAX_CHANCE = 95; // Slightly reduced from 98
   const MIN_CHANCE = 2; // Slightly increased from 1
+  const MAX_GAIN = 10000; // Maximum profit allowed per bet
 
   // Derived Values
   const multiplier = (100 - HOUSE_EDGE) / winChance;
-  const profitOnWin = betAmount * multiplier - betAmount;
+  const potentialProfit = betAmount * multiplier - betAmount;
+  const actualProfit = Math.min(potentialProfit, MAX_GAIN);
   const rollUnder = winChance;
 
   const handleRoll = () => {
@@ -64,7 +66,7 @@ export default function CasinoDice() {
     setTimeout(() => {
       const result = parseFloat((Math.random() * 100).toFixed(2));
       const won = result < rollUnder;
-      const profit = won ? profitOnWin : -betAmount;
+      const profit = won ? actualProfit : -betAmount;
       
       setLastRoll({
         result,
@@ -155,7 +157,7 @@ export default function CasinoDice() {
               </div>
               <div className="bg-surface/50 p-3 rounded-lg border border-success/20 flex items-center gap-2">
                 <Trophy className="w-4 h-4 text-success" />
-                <span className="font-mono text-success font-bold">+{profitOnWin.toFixed(2)} COINS</span>
+                <span className="font-mono text-success font-bold">+{actualProfit.toFixed(2)} COINS</span>
               </div>
             </div>
 
@@ -297,8 +299,11 @@ export default function CasinoDice() {
                     <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Multiplier</div>
                     <div className="text-xl font-mono font-bold text-white">{multiplier.toFixed(4)}x</div>
                   </div>
-                  <div className="bg-surface/50 rounded-xl p-4 border border-white/5 text-center">
-                    <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Roll Under</div>
+                  <div className="bg-surface/50 rounded-xl p-4 border border-white/5 text-center flex flex-col justify-center">
+                    <div className="flex justify-between items-center px-2 mb-1">
+                      <div className="text-gray-400 text-xs font-bold uppercase tracking-wider">Roll Under</div>
+                      <div className="text-[8px] text-warning font-bold uppercase">Max: {MAX_GAIN}</div>
+                    </div>
                     <div className="text-xl font-mono font-bold text-success">{rollUnder.toFixed(2)}</div>
                   </div>
                   <div className="bg-surface/50 rounded-xl p-4 border border-white/5 text-center">

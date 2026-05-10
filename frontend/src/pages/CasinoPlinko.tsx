@@ -68,7 +68,9 @@ export default function CasinoPlinko() {
     const bucketIndex = Math.round(currentIndex);
     const multiplier = multipliers[bucketIndex];
     const payout = betAmount * multiplier;
-    const profit = payout - betAmount;
+    const MAX_GAIN = 10000;
+    const profit = Math.min(payout - betAmount, MAX_GAIN);
+    const actualPayout = betAmount + profit;
 
     const newBall: Ball = {
       id: ballId,
@@ -76,7 +78,7 @@ export default function CasinoPlinko() {
         x: 50 + p.x * (100 / (rows + 2)),
         y: 5 + (i * (85 / rows))
       })),
-      payout,
+      payout: actualPayout,
       multiplier
     };
 
@@ -138,7 +140,10 @@ export default function CasinoPlinko() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Bet Amount</label>
+              <div className="flex justify-between items-center px-1">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Bet Amount</label>
+                <span className="text-[10px] text-warning font-bold uppercase tracking-wider">Max Gain: 10000</span>
+              </div>
               <div className="flex bg-surface rounded-lg border border-white/10 overflow-hidden">
                 <input
                   type="number"
