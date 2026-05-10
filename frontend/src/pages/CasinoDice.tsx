@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Dice5, Trophy, RefreshCw } from 'lucide-react';
+import { Dice5, Trophy, RefreshCw, BarChart2 } from 'lucide-react';
 
 export default function CasinoDice() {
   const [betAmount, setBetAmount] = useState<number>(10);
   const [winChance, setWinChance] = useState<number>(50);
   const [rolling, setRolling] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ result: number; won: boolean; profit: number } | null>(null);
+
+  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
 
   // Constants
   const HOUSE_EDGE = 1; // 1%
@@ -27,12 +29,20 @@ export default function CasinoDice() {
     setTimeout(() => {
       const result = parseFloat((Math.random() * 100).toFixed(2));
       const won = result < rollUnder;
+      const profit = won ? profitOnWin : -betAmount;
       
       setLastRoll({
         result,
         won,
-        profit: won ? profitOnWin : -betAmount
+        profit
       });
+      
+      setStats(prev => ({
+        wins: prev.wins + (won ? 1 : 0),
+        losses: prev.losses + (won ? 0 : 1),
+        totalProfit: prev.totalProfit + profit
+      }));
+      
       setRolling(false);
     }, 600);
   };
@@ -52,6 +62,7 @@ export default function CasinoDice() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Controls */}
         <div className="lg:col-span-1 space-y-6">
+          {/* ... Control Panel ... */}
           <div className="glass-panel p-6 rounded-2xl space-y-6">
             {/* Bet Amount */}
             <div className="space-y-2">
@@ -182,6 +193,30 @@ export default function CasinoDice() {
               </div>
             </div>
 
+          </div>
+
+          {/* Session Statistics Panel */}
+          <div className="glass-panel p-6 rounded-2xl animate-in slide-in-from-bottom-4">
+            <h3 className="font-bold font-display text-lg mb-4 flex items-center gap-2 text-gray-300">
+              <BarChart2 className="w-5 h-5 text-secondary" />
+              Session Statistics
+            </h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-surface/30 rounded-xl p-4 text-center border border-white/5">
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Wins</div>
+                <div className="text-2xl font-mono font-bold text-success">{stats.wins}</div>
+              </div>
+              <div className="bg-surface/30 rounded-xl p-4 text-center border border-white/5">
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Losses</div>
+                <div className="text-2xl font-mono font-bold text-danger">{stats.losses}</div>
+              </div>
+              <div className="bg-surface/30 rounded-xl p-4 text-center border border-white/5">
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Net Profit</div>
+                <div className={`text-2xl font-mono font-bold ${stats.totalProfit > 0 ? 'text-success' : stats.totalProfit < 0 ? 'text-danger' : 'text-gray-400'}`}>
+                  {stats.totalProfit > 0 ? '+' : ''}{stats.totalProfit.toFixed(2)}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
