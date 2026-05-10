@@ -44,9 +44,9 @@ export default function CasinoDice() {
   }, [autoRunning, rolling, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss]);
 
   // Constants
-  const HOUSE_EDGE = 1; // 1%
-  const MAX_CHANCE = 98;
-  const MIN_CHANCE = 1;
+  const HOUSE_EDGE = 3.5; // Increased from 1% to 3.5% for higher casino profit
+  const MAX_CHANCE = 95; // Slightly reduced from 98
+  const MIN_CHANCE = 2; // Slightly increased from 1
 
   // Derived Values
   const multiplier = (100 - HOUSE_EDGE) / winChance;
@@ -91,7 +91,7 @@ export default function CasinoDice() {
         </div>
         <div>
           <h2 className="text-3xl font-display font-bold">Provably Fair Dice</h2>
-          <p className="text-gray-400">Set your win chance and roll the dice. 1% House Edge.</p>
+          <p className="text-gray-400">Set your win chance and roll the dice. 3.5% House Edge.</p>
         </div>
       </div>
 
