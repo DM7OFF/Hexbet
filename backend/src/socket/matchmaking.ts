@@ -9,7 +9,7 @@ interface Player {
 }
 
 const queue: Player[] = [];
-const activeMatches: Record<string, { p1: Player; p2: Player; gameType: string; stake: number }> = {};
+const activeMatches: Record<string, { p1: Player; p2: Player; gameType: string; stake: number; winnerId?: string; state?: string; newStake?: number }> = {};
 const matchRolls: Record<string, { p1Roll?: number; p2Roll?: number }> = {};
 
 export function setupMatchmaking(io: Server) {
@@ -57,16 +57,59 @@ export function setupMatchmaking(io: Server) {
 
       if (rolls.p1Roll !== undefined && rolls.p2Roll !== undefined) {
         // Both rolled, evaluate
+        const p1Won = rolls.p1Roll > rolls.p2Roll;
+        const p2Won = rolls.p2Roll > rolls.p1Roll;
+        const winnerId = p1Won ? match.p1.userId : p2Won ? match.p2.userId : 'draw';
+        
+        match.winnerId = winnerId;
+        match.state = 'rematch_phase';
+
         setTimeout(() => {
           io.to(data.matchId).emit('match_result', {
             p1: { userId: match.p1.userId, socketId: match.p1.socketId, roll: rolls.p1Roll },
-            p2: { userId: match.p2.userId, socketId: match.p2.socketId, roll: rolls.p2Roll }
+            p2: { userId: match.p2.userId, socketId: match.p2.socketId, roll: rolls.p2Roll },
+            winnerId
           });
-          // Cleanup
-          delete activeMatches[data.matchId];
-          delete matchRolls[data.matchId];
+          delete matchRolls[data.matchId]; // keep activeMatches for rematch
         }, 1000); // Small delay for animation
       }
+    });
+
+    socket.on('propose_rematch', (data: { matchId: string; newStake: number }) => {
+      const match = activeMatches[data.matchId];
+      if (!match) return;
+      if (match.winnerId === 'draw') {
+        match.newStake = data.newStake;
+        socket.to(data.matchId).emit('rematch_proposed', { newStake: data.newStake });
+      } else {
+        const isWinner = match.p1.socketId === socket.id ? match.winnerId === match.p1.userId : match.winnerId === match.p2.userId;
+        if (isWinner) {
+          match.newStake = data.newStake;
+          socket.to(data.matchId).emit('rematch_proposed', { newStake: data.newStake });
+        }
+      }
+    });
+
+    socket.on('vote_rematch', (data: { matchId: string; accept: boolean }) => {
+      const match = activeMatches[data.matchId];
+      if (!match) return;
+
+      if (data.accept) {
+        match.stake = match.newStake || match.stake;
+        match.state = 'playing';
+        match.winnerId = undefined;
+        match.newStake = undefined;
+        io.to(data.matchId).emit('rematch_started', { stake: match.stake });
+      } else {
+        io.to(data.matchId).emit('match_ended');
+        delete activeMatches[data.matchId];
+      }
+    });
+
+    socket.on('leave_match', (matchId: string) => {
+      io.to(matchId).emit('match_ended');
+      delete activeMatches[matchId];
+      delete matchRolls[matchId];
     });
 
     socket.on('disconnect', () => {

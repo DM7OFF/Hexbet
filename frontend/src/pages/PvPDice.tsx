@@ -12,8 +12,12 @@ export default function PvPDice() {
   const [winner, setWinner] = useState<'me' | 'opponent' | 'draw' | null>(null);
   const [opponentHasRolled, setOpponentHasRolled] = useState(false);
 
-  // Simulation data
-  const stake = 0.5;
+  // Rematch & Stake logic
+  const [stake, setStake] = useState(0.5);
+  const [proposedStake, setProposedStake] = useState<number | null>(null);
+  const [rematchProposedByOpponent, setRematchProposedByOpponent] = useState(false);
+  const [newStakeInput, setNewStakeInput] = useState(0.5);
+
   const pot = stake * 2;
   const winnerPayout = pot * 0.8;
 
@@ -45,14 +49,39 @@ export default function PvPDice() {
       if (myData.roll > oppData.roll) setWinner('me');
       else if (oppData.roll > myData.roll) setWinner('opponent');
       else setWinner('draw');
+      
+      setNewStakeInput(stake);
+    });
+
+    socket.on('rematch_proposed', (data: { newStake: number }) => {
+      setProposedStake(data.newStake);
+      setRematchProposedByOpponent(true);
+    });
+
+    socket.on('rematch_started', (data: { stake: number }) => {
+      setGameState('playing');
+      setMyRoll(null);
+      setOpponentRoll(null);
+      setWinner(null);
+      setStake(data.stake);
+      setProposedStake(null);
+      setRematchProposedByOpponent(false);
+      setOpponentHasRolled(false);
+    });
+
+    socket.on('match_ended', () => {
+      window.location.href = '/ranked';
     });
 
     return () => {
       socket.off('player_joined');
       socket.off('opponent_rolled');
       socket.off('match_result');
+      socket.off('rematch_proposed');
+      socket.off('rematch_started');
+      socket.off('match_ended');
     };
-  }, [matchId]);
+  }, [matchId, stake]);
 
   const handleRoll = () => {
     if (gameState !== 'playing' || myRoll !== null || !matchId) return;
@@ -195,9 +224,33 @@ export default function PvPDice() {
             <p className="text-xl text-gray-300 font-medium">
               {winner === 'me' ? `You won ${winnerPayout.toFixed(2)} ETH` : winner === 'opponent' ? `You lost ${stake.toFixed(2)} ETH` : 'Stake returned'}
             </p>
-            <div className="mt-8 flex gap-4">
-              <button className="btn-secondary py-3 px-8 text-sm" onClick={() => window.location.href = '/ranked'}>Back to Lobby</button>
-              <button className="btn-primary py-3 px-8 text-sm" onClick={() => window.location.reload()}>Play Again</button>
+            <div className="mt-8 flex flex-col items-center gap-4">
+              {rematchProposedByOpponent && proposedStake !== null ? (
+                <div className="bg-surface/50 p-4 rounded-xl border border-white/10 flex flex-col items-center gap-4">
+                  <p className="text-white font-bold">{winner === 'draw' ? 'Opponent' : 'Winner'} proposed rematch for <span className="text-success">{proposedStake} ETH</span></p>
+                  <div className="flex gap-4">
+                    <button className="btn-secondary py-2 px-6" onClick={() => socket.emit('vote_rematch', { matchId, accept: false })}>Decline</button>
+                    <button className="btn-primary py-2 px-6" onClick={() => socket.emit('vote_rematch', { matchId, accept: true })}>Accept</button>
+                  </div>
+                </div>
+              ) : (winner === 'me' || winner === 'draw') ? (
+                proposedStake === null ? (
+                  <div className="flex gap-2 items-center bg-surface/50 p-2 rounded-xl border border-white/10">
+                    <span className="text-gray-400 font-bold px-2">New Stake:</span>
+                    <input type="number" step="0.1" min="0.1" value={newStakeInput} onChange={e => setNewStakeInput(Number(e.target.value))} className="w-24 bg-surface border border-white/10 rounded px-2 py-1 font-mono text-white" />
+                    <button className="btn-primary py-2 px-6" onClick={() => {
+                      socket.emit('propose_rematch', { matchId, newStake: newStakeInput });
+                      setProposedStake(newStakeInput);
+                    }}>Propose Rematch</button>
+                  </div>
+                ) : (
+                  <p className="text-gray-400 animate-pulse">Waiting for opponent to accept...</p>
+                )
+              ) : (
+                <p className="text-gray-400 animate-pulse">Waiting for winner to propose rematch...</p>
+              )}
+
+              <button className="btn-secondary py-2 px-6 text-sm mt-4" onClick={() => socket.emit('leave_match', matchId)}>Leave Match</button>
             </div>
           </div>
         )}
