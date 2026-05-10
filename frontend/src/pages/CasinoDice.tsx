@@ -338,7 +338,6 @@ export default function CasinoDice() {
 
           {/* Session Statistics Panel */}
         </div>
-      </div>
       
       <StatsFloater stats={stats} onReset={resetStats} />
     </div>

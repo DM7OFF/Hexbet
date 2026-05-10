@@ -278,7 +278,6 @@ export default function CasinoPlinko() {
               ))}
             </div>
           </div>
-
         </div>
       </div>
       <StatsFloater stats={stats} onReset={resetStats} />

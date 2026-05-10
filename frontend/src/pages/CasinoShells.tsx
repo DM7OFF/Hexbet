@@ -372,8 +372,6 @@ export default function CasinoShells() {
               )}
             </AnimatePresence>
           </div>
-
-          </div>
         </div>
       </div>
       <StatsFloater stats={stats} onReset={resetStats} />
