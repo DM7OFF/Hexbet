@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Swords, User, CheckCircle2 } from 'lucide-react';
 import { socket } from '../App';
+import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function PvPDice() {
+  const { balance, updateBalance, recordWager } = useBalance();
   const { matchId } = useParams<{ matchId: string }>();
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'finished'>('waiting');
   const [myRoll, setMyRoll] = useState<number | null>(null);
@@ -46,9 +48,15 @@ export default function PvPDice() {
       setMyRoll(myData.roll);
       setOpponentRoll(oppData.roll);
 
-      if (myData.roll > oppData.roll) setWinner('me');
+      if (myData.roll > oppData.roll) {
+        setWinner('me');
+        updateBalance(winnerPayout); // Pay out to winner
+      }
       else if (oppData.roll > myData.roll) setWinner('opponent');
-      else setWinner('draw');
+      else {
+        setWinner('draw');
+        updateBalance(stake); // Return stake on draw
+      }
       
       setNewStakeInput(stake);
     });
@@ -81,12 +89,18 @@ export default function PvPDice() {
       socket.off('rematch_started');
       socket.off('match_ended');
     };
-  }, [matchId, stake]);
+  }, [matchId, stake, winnerPayout, updateBalance]);
 
   const handleRoll = () => {
     if (gameState !== 'playing' || myRoll !== null || !matchId) return;
+    if (balance < stake) {
+      alert("Insufficient balance for this stake!");
+      return;
+    }
     
     setIsRolling(true);
+    updateBalance(-stake); // Deduct stake
+    recordWager(stake, true); // Track progression (Ranked)
 
     const result = Math.floor(Math.random() * 100) + 1;
     setMyRoll(result); // Show locally instantly
@@ -109,7 +123,7 @@ export default function PvPDice() {
         
         <div className="glass-panel px-6 py-3 rounded-xl border-primary/20 flex flex-col items-end">
           <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">Total Pot</span>
-          <span className="text-2xl font-mono font-bold text-success">{pot.toFixed(2)} ETH</span>
+          <span className="text-2xl font-mono font-bold text-success">{(stake * 2).toFixed(2)} COINS</span>
         </div>
       </div>
 
@@ -222,12 +236,12 @@ export default function PvPDice() {
               {winner === 'me' ? 'VICTORY!' : winner === 'opponent' ? 'DEFEAT' : 'DRAW'}
             </h2>
             <p className="text-xl text-gray-300 font-medium">
-              {winner === 'me' ? `You won ${winnerPayout.toFixed(2)} ETH` : winner === 'opponent' ? `You lost ${stake.toFixed(2)} ETH` : 'Stake returned'}
+              {winner === 'me' ? `You won ${winnerPayout.toFixed(2)} COINS` : winner === 'opponent' ? `You lost ${stake.toFixed(2)} COINS` : 'Stake returned'}
             </p>
             <div className="mt-8 flex flex-col items-center gap-4">
               {rematchProposedByOpponent && proposedStake !== null ? (
                 <div className="bg-surface/50 p-4 rounded-xl border border-white/10 flex flex-col items-center gap-4">
-                  <p className="text-white font-bold">{winner === 'draw' ? 'Opponent' : 'Winner'} proposed rematch for <span className="text-success">{proposedStake} ETH</span></p>
+                  <p className="text-white font-bold">{winner === 'draw' ? 'Opponent' : 'Winner'} proposed rematch for <span className="text-success">{proposedStake} COINS</span></p>
                   <div className="flex gap-4">
                     <button className="btn-secondary py-2 px-6" onClick={() => socket.emit('vote_rematch', { matchId, accept: false })}>Decline</button>
                     <button className="btn-primary py-2 px-6" onClick={() => socket.emit('vote_rematch', { matchId, accept: true })}>Accept</button>

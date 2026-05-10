@@ -13,7 +13,7 @@ const GAMES = [
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function RankedLobby() {
-  const { balance } = useBalance();
+  const { balance, league, level } = useBalance();
   const [selectedGame, setSelectedGame] = useState(GAMES[1].id); // Default to dice
   const [isSearching, setIsSearching] = useState(false);
   const [stake, setStake] = useState<number>(10);
@@ -67,12 +67,12 @@ export default function RankedLobby() {
         <div className="glass-panel px-6 py-4 rounded-xl flex items-center gap-6 border-primary/20">
           <div>
             <div className="text-xs text-gray-400 uppercase tracking-wider font-bold">Your Rank</div>
-            <div className="text-xl font-display font-bold text-primary drop-shadow-[0_0_10px_rgba(255,42,95,0.5)]">Gold III</div>
+            <div className="text-xl font-display font-bold text-primary drop-shadow-[0_0_10px_rgba(255,42,95,0.5)]">{league}</div>
           </div>
           <div className="h-10 w-px bg-white/10"></div>
           <div>
-            <div className="text-xs text-gray-400 uppercase tracking-wider font-bold">ELO</div>
-            <div className="text-xl font-mono font-bold">1,842</div>
+            <div className="text-xs text-gray-400 uppercase tracking-wider font-bold">Level</div>
+            <div className="text-xl font-mono font-bold">{level}</div>
           </div>
         </div>
       </div>

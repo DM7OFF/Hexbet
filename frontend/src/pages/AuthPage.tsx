@@ -24,7 +24,7 @@ const GAME_NAMES = ['Crash', 'Dice', 'Plinko', 'Roulette', 'Ranked PvP'];
 
 function generateWin(id: number): LiveWin {
   const multipliers = ['2.4x', '5.7x', '11.2x', '3.1x', '24.5x', '8.8x', '1.9x', '42.0x'];
-  const amounts = ['0.12', '0.45', '1.2', '0.08', '2.5', '0.33', '5.0', '0.9'];
+  const amounts = ['125.0', '450.0', '1200.0', '80.0', '2500.0', '330.0', '5000.0', '900.0'];
   const colors = ['text-green-400', 'text-yellow-400', 'text-purple-400', 'text-cyan-400', 'text-pink-400'];
   return {
     id,
@@ -200,7 +200,7 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
                   <span className="text-gray-400 font-medium w-24 truncate">{win.player}</span>
                   <span className="text-gray-500 text-xs">{win.game}</span>
                   <span className="text-purple-400 font-mono text-xs">{win.multiplier}</span>
-                  <span className={`font-mono font-bold ${win.color}`}>+{win.amount} ETH</span>
+                  <span className={`font-mono font-bold ${win.color}`}>+{win.amount} COINS</span>
                 </div>
               ))}
             </div>

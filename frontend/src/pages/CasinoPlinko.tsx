@@ -33,7 +33,7 @@ interface Ball {
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function CasinoPlinko() {
-  const { balance, updateBalance, getMaxGain } = useBalance();
+  const { balance, updateBalance, getMaxGain, recordWager } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
   const MAX_GAIN = getMaxGain();
 
@@ -63,6 +63,7 @@ export default function CasinoPlinko() {
 
     const ballId = Math.random().toString(36).substr(2, 9);
     updateBalance(-betAmount); // Deduct stake
+    recordWager(betAmount); // Track progression
     
     // Generate Path
     let currentIndex = 0;

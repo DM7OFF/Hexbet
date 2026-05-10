@@ -5,7 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function CasinoDice() {
-  const { balance, updateBalance, getMaxGain } = useBalance();
+  const { balance, updateBalance, getMaxGain, recordWager } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
 
   // Auto-adjust bet amount if it exceeds balance
@@ -73,6 +73,7 @@ export default function CasinoDice() {
     setRolling(true);
     setLastRoll(null);
     updateBalance(-betAmount); // Deduct stake
+    recordWager(betAmount); // Track progression
 
     // Simulate network delay and RNG
     setTimeout(() => {

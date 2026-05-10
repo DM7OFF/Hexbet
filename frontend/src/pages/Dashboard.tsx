@@ -1,27 +1,47 @@
-import { Trophy, Activity, Wallet, Target, ChevronRight } from 'lucide-react';
+import { Trophy, Activity, Wallet, Target, ChevronRight, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const STATS = [
-  { label: 'Total Matches', value: '142', icon: Activity, color: 'text-secondary' },
-  { label: 'Win Rate', value: '54.2%', icon: Target, color: 'text-success' },
-  { label: 'Total Winnings', value: '12.5 ETH', icon: Wallet, color: 'text-warning' },
-  { label: 'Current Rank', value: 'Gold III', icon: Trophy, color: 'text-primary' },
-];
-
-const RECENT_MATCHES = [
-  { id: '1', game: 'Crash PvP', result: 'Win', amount: '+0.5 ETH', opponent: 'CryptoKing', time: '2m ago' },
-  { id: '2', game: 'Dice Duel', result: 'Loss', amount: '-0.1 ETH', opponent: 'SatoshiFan', time: '15m ago' },
-  { id: '3', game: 'Crash PvP', result: 'Win', amount: '+1.2 ETH', opponent: 'WhaleHunter', time: '1h ago' },
-  { id: '4', game: 'Card Battle', result: 'Win', amount: '+0.2 ETH', opponent: 'MoonBoy', time: '3h ago' },
-];
+import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function Dashboard() {
+  const { balance, league, level, xp, wageredAmount, wagerGoal } = useBalance();
+  const xpToLevel = level * 100;
+  
+  const STATS = [
+    { label: 'Current Balance', value: `${balance.toFixed(2)} COINS`, icon: Wallet, color: 'text-success' },
+    { label: 'Win Rate', value: '54.2%', icon: Target, color: 'text-secondary' },
+    { label: 'Experience', value: `${xp}/${xpToLevel} XP`, icon: Activity, color: 'text-warning' },
+    { label: 'Current League', value: `${league}`, icon: Trophy, color: 'text-primary' },
+  ];
+
+  const RECENT_MATCHES = [
+    { id: '1', game: 'Dice Casino', result: 'Win', amount: '+45.00 COINS', opponent: 'House', time: '2m ago' },
+    { id: '2', game: 'Dice Duel', result: 'Loss', amount: '-50.00 COINS', opponent: 'SatoshiFan', time: '15m ago' },
+    { id: '3', game: 'Plinko', result: 'Win', amount: '+12.50 COINS', opponent: 'House', time: '1h ago' },
+    { id: '4', game: 'Shells PvP', result: 'Win', amount: '+80.00 COINS', opponent: 'MoonBoy', time: '3h ago' },
+  ];
+
+  const wagerPercentage = (wageredAmount / wagerGoal) * 100;
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-4xl font-display font-bold">Welcome back, <span className="text-primary">PlayerOne</span></h2>
-          <p className="text-gray-400 mt-2 text-lg">Ready to climb the ranks today?</p>
+          <h2 className="text-4xl font-display font-bold">Welcome back, <span className="text-primary">Player</span></h2>
+          <p className="text-gray-400 mt-2 text-lg">You are currently Level {level} in the {league} League.</p>
+        </div>
+        
+        <div className="glass-panel p-4 rounded-xl border-primary/20 flex flex-col gap-2 min-w-[250px]">
+          <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            <span>Next League Progress</span>
+            <span>{wageredAmount.toFixed(0)} / {wagerGoal} Wagered</span>
+          </div>
+          <div className="h-2 w-full bg-surface rounded-full overflow-hidden border border-white/5">
+            <div 
+              className="h-full bg-gradient-to-r from-success to-secondary transition-all duration-1000" 
+              style={{ width: `${wagerPercentage}%` }}
+            ></div>
+          </div>
+          <p className="text-[9px] text-gray-500 text-center italic">Wager {wagerGoal - wageredAmount} more to reach next Rank & increase Max Gain!</p>
         </div>
       </div>
 
@@ -36,7 +56,7 @@ export default function Dashboard() {
                   <Icon className={`w-6 h-6 ${stat.color}`} />
                 </div>
               </div>
-              <div className="text-3xl font-mono font-bold">{stat.value}</div>
+              <div className="text-2xl font-mono font-bold truncate">{stat.value}</div>
               <div className="text-sm text-gray-400 mt-1 font-medium">{stat.label}</div>
             </div>
           );
@@ -45,13 +65,16 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass-panel rounded-xl p-8 relative overflow-hidden">
+          <div className="glass-panel rounded-xl p-8 relative overflow-hidden border-primary/10">
             <div className="absolute right-0 top-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="space-y-4">
+                <div className="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-widest">
+                  <Zap className="w-4 h-4" /> Recommended
+                </div>
                 <h3 className="text-3xl font-display font-bold">Compete in PvP Ranked</h3>
                 <p className="text-gray-400 max-w-md">
-                  Challenge other players in skill-based crypto games. Climb the ELO ladder and earn exclusive rewards.
+                  Challenge other players in skill-based crypto games. Climb the ladder and earn huge rewards for each league up.
                 </p>
                 <Link to="/ranked" className="btn-primary inline-flex items-center gap-2">
                   <Trophy className="w-5 h-5" />
@@ -65,7 +88,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="glass-panel rounded-xl p-8 relative overflow-hidden">
+          <div className="glass-panel rounded-xl p-8 relative overflow-hidden border-secondary/10">
             <div className="absolute left-0 bottom-0 w-64 h-64 bg-secondary/10 rounded-full blur-3xl"></div>
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="w-40 h-40 relative hidden md:block">
@@ -75,7 +98,7 @@ export default function Dashboard() {
               <div className="space-y-4 md:text-right flex-1">
                 <h3 className="text-3xl font-display font-bold">Play Casual Casino</h3>
                 <p className="text-gray-400 max-w-md ml-auto">
-                  Relax with classic provably fair RNG games. Instant payouts and seamless experience.
+                  Relax with classic provably fair RNG games. Instant payouts and seamless experience. Great for building wager volume!
                 </p>
                 <Link to="/casino" className="btn-secondary inline-flex items-center gap-2">
                   Play Casino
@@ -87,16 +110,16 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-6">
-          <div className="glass-panel rounded-xl p-6 h-full">
+          <div className="glass-panel rounded-xl p-6 h-full border-white/5">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold font-display">Recent Matches</h3>
+              <h3 className="text-xl font-bold font-display">Activity</h3>
               <Link to="/history" className="text-sm text-primary hover:underline">View All</Link>
             </div>
             <div className="space-y-4">
               {RECENT_MATCHES.map((match) => (
-                <div key={match.id} className="p-4 rounded-lg bg-surface/50 border border-white/5 hover:bg-white/5 transition-colors cursor-pointer">
+                <div key={match.id} className="p-4 rounded-lg bg-surface/50 border border-white/5 hover:bg-white/5 transition-all cursor-pointer group">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold">{match.game}</span>
+                    <span className="font-bold group-hover:text-primary transition-colors">{match.game}</span>
                     <span className={`font-mono font-bold ${match.result === 'Win' ? 'text-success' : 'text-danger'}`}>
                       {match.amount}
                     </span>

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function CasinoShells() {
-  const { balance, updateBalance, getMaxGain } = useBalance();
+  const { balance, updateBalance, getMaxGain, recordWager } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
   const MAX_GAIN = getMaxGain();
 
@@ -97,6 +97,7 @@ export default function CasinoShells() {
     setWinningIndex(null);
     setSelectedIndex(null);
     updateBalance(-betAmount); // Deduct stake
+    recordWager(betAmount); // Track progression
 
     // Shuffle logic with extra randomization to ensure no bias
     setTimeout(() => {

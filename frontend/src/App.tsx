@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { BalanceProvider, useBalance } from './context/BalanceContext.tsx';
-import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History } from 'lucide-react';
+import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History, Shield } from 'lucide-react';
 import { io } from 'socket.io-client';
 import type { Session } from '@supabase/supabase-js';
 import Dashboard from './pages/Dashboard.tsx';
@@ -15,6 +15,7 @@ import PvPShells from './pages/PvPShells.tsx';
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
 function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void }) {
+  const { league, level } = useBalance();
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   const username = session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'Player';
@@ -65,7 +66,10 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
           </div>
           <div className="min-w-0">
             <div className="text-sm font-bold truncate">{username}</div>
-            <div className="text-xs text-primary font-mono font-medium">Gold Rank</div>
+            <div className="text-[10px] text-primary font-mono font-medium flex items-center gap-1">
+              <Shield className="w-3 h-3" />
+              {league} League (Lvl {level})
+            </div>
           </div>
         </div>
         <button
@@ -80,17 +84,29 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
 }
 
 function Topbar() {
-  const { balance } = useBalance();
+  const { balance, xp, level } = useBalance();
+  const xpToLevel = level * 100;
+  const xpPercentage = (xp / xpToLevel) * 100;
   
   return (
     <header className="h-20 ml-64 flex items-center justify-between px-8 border-b border-white/10 glass-panel sticky top-0 z-40">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         <div className="px-4 py-2 rounded-full bg-surface border border-white/10 flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-success animate-pulse"></div>
-          <span className="text-sm font-medium text-gray-300">Server Status: Online</span>
+          <span className="text-sm font-medium text-gray-300">Server: Online</span>
         </div>
-        <div className="px-4 py-2 rounded-full bg-surface border border-white/10 flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-300">PvP Players: <span className="text-primary">1,402</span></span>
+        
+        <div className="flex flex-col gap-1 w-48">
+          <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            <span>Level {level}</span>
+            <span>{xp}/{xpToLevel} XP</span>
+          </div>
+          <div className="h-1.5 w-full bg-surface rounded-full overflow-hidden border border-white/5">
+            <div 
+              className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500" 
+              style={{ width: `${xpPercentage}%` }}
+            ></div>
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-6">
@@ -99,7 +115,7 @@ function Topbar() {
             <div className="text-xs text-gray-400">Balance</div>
             <div className="text-lg font-mono font-bold text-success">{balance.toFixed(2)} COINS</div>
           </div>
-          <button className="btn-primary py-2 px-4 text-sm">Deposit</button>
+          <button className="btn-primary py-2 px-4 text-sm shadow-[0_0_15px_rgba(255,42,95,0.2)]">Deposit</button>
         </div>
       </div>
     </header>

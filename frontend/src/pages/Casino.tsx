@@ -110,11 +110,11 @@ export default function Casino() {
             </thead>
             <tbody className="text-sm">
               {[
-                { game: 'Dice', player: 'Hidden', bet: '0.05 ETH', mult: '2.00x', payout: '0.10 ETH', win: true },
-                { game: 'Crash', player: 'CryptoPro', bet: '0.10 ETH', mult: '-', payout: '0.00 ETH', win: false },
-                { game: 'Roulette', player: 'Hidden', bet: '0.01 ETH', mult: '14.00x', payout: '0.14 ETH', win: true },
-                { game: 'Plinko', player: 'MoonBoy', bet: '0.50 ETH', mult: '0.50x', payout: '0.25 ETH', win: false },
-                { game: 'Crash', player: 'Whale', bet: '2.00 ETH', mult: '1.50x', payout: '3.00 ETH', win: true },
+                { game: 'Dice', player: 'Hidden', bet: '50.00 COINS', mult: '2.00x', payout: '100.00 COINS', win: true },
+                { game: 'Crash', player: 'CryptoPro', bet: '10.00 COINS', mult: '-', payout: '0.00 COINS', win: false },
+                { game: 'Roulette', player: 'Hidden', bet: '25.00 COINS', mult: '14.00x', payout: '350.00 COINS', win: true },
+                { game: 'Plinko', player: 'MoonBoy', bet: '5.00 COINS', mult: '0.50x', payout: '2.50 COINS', win: false },
+                { game: 'Crash', player: 'Whale', bet: '200.00 COINS', mult: '1.50x', payout: '300.00 COINS', win: true },
               ].map((bet, i) => (
                 <tr key={i} className="border-t border-white/5 hover:bg-white/5 transition-colors">
                   <td className="p-4 font-bold">{bet.game}</td>

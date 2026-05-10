@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { RefreshCw, User, Target, CheckCircle2 } from 'lucide-react';
 import { socket } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function PvPShells() {
+  const { balance, updateBalance, recordWager } = useBalance();
   const { matchId } = useParams();
   const navigate = useNavigate();
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'revealing' | 'rematch_phase'>('waiting');
@@ -33,6 +35,16 @@ export default function PvPShells() {
     socket.on('match_result', (result) => {
       setMatchResult(result);
       setGameState('revealing');
+
+      const myData = result.p1.socketId === socket.id ? result.p1 : result.p2;
+      const isWinner = result.winnerId !== 'draw' && result.winnerId === myData.userId;
+      
+      if (isWinner) {
+        updateBalance(stake * 2 * 0.8);
+      } else if (result.winnerId === 'draw') {
+        updateBalance(stake);
+      }
+
       setTimeout(() => {
         setGameState('rematch_phase');
       }, 4000);
@@ -69,7 +81,13 @@ export default function PvPShells() {
 
   const handlePick = (index: number) => {
     if (gameState !== 'playing' || myPick !== null) return;
+    if (balance < (stake || 0)) {
+      alert("Insufficient balance!");
+      return;
+    }
     setMyPick(index);
+    updateBalance(-(stake || 0));
+    recordWager(stake || 0, true);
     socket.emit('submit_pick', { matchId, pick: index });
   };
 
@@ -103,7 +121,7 @@ export default function PvPShells() {
         <div className="text-center">
           <div className="text-xs text-gray-500 uppercase font-bold mb-1 tracking-widest">Stake Pot</div>
           <div className="text-3xl font-display font-black text-primary drop-shadow-[0_0_15px_rgba(255,42,95,0.4)]">
-            {(stake * 2).toFixed(2)} <span className="text-sm">ETH</span>
+            {(stake * 2).toFixed(2)} <span className="text-sm">COINS</span>
           </div>
         </div>
 
@@ -217,7 +235,7 @@ export default function PvPShells() {
                     value={proposedStake}
                     onChange={(e) => setProposedStake(Number(e.target.value))}
                     className="flex-1 bg-surface border border-white/10 p-4 rounded-xl font-mono text-xl outline-none focus:border-primary"
-                    placeholder="New Stake (ETH)"
+                    placeholder="New Stake (COINS)"
                   />
                   <button 
                     disabled={hasVoted}
@@ -233,7 +251,7 @@ export default function PvPShells() {
               <div className="flex flex-col items-center gap-6">
                 <div className="text-center">
                   <h3 className="text-2xl font-display font-bold">Rematch Proposed!</h3>
-                  <p className="text-gray-400">New Stake: <span className="text-white font-mono font-bold">{proposedStake} ETH</span></p>
+                  <p className="text-gray-400">New Stake: <span className="text-white font-mono font-bold">{proposedStake} COINS</span></p>
                 </div>
                 <div className="flex gap-4 w-full max-w-sm">
                   <button 
