@@ -84,7 +84,8 @@ export default function PvPShells() {
     if (!accept) navigate('/ranked');
   };
 
-  const isWinner = matchResult?.winnerId === 'GuestPlayer'; // Simplified for demo
+  const myData = matchResult?.p1?.socketId === socket.id ? matchResult?.p1 : matchResult?.p2;
+  const isWinner = matchResult?.winnerId !== 'draw' && matchResult?.winnerId === myData?.userId;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -170,7 +171,9 @@ export default function PvPShells() {
                   {/* Pick Labels */}
                   <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex flex-col gap-1 items-center">
                     {myPick === id && <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase">Your Pick</span>}
-                    {gameState === 'revealing' && matchResult?.p2?.pick === id && <span className="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded uppercase">Opponent</span>}
+                    {gameState === 'revealing' && (matchResult?.p1?.socketId === socket.id ? matchResult?.p2?.pick : matchResult?.p1?.pick) === id && (
+                      <span className="text-[10px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded uppercase">Opponent</span>
+                    )}
                   </div>
                 </motion.div>
               ))}
