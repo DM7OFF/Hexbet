@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, History, Trophy, RotateCcw, Play } from 'lucide-react';
+import { Wallet, Coins, Trophy, RotateCcw } from 'lucide-react';
 
 type Card = {
   suit: string;

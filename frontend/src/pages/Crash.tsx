@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, History, Zap, TrendingUp, AlertCircle } from 'lucide-react';
+import { Wallet, Coins, History, AlertCircle } from 'lucide-react';
 
 export default function Crash() {
   const { balance, updateBalance, recordWager, getMaxGain } = useBalance();
@@ -23,17 +23,15 @@ export default function Crash() {
     setCashoutAt(null);
     setGameState('running');
     
-    // Provably fair-ish crash point (for demo)
     const newCrashPoint = 1 + (Math.random() * (Math.random() < 0.1 ? 10 : 2.5));
     setCrashPoint(newCrashPoint);
     
     startTimeRef.current = Date.now();
-    gameLoopRef.current = requestAnimationFrame(updateMultiplier);
+    gameLoopRef.current = requestAnimationFrame(() => updateMultiplier());
   };
 
   const updateMultiplier = () => {
     const elapsed = (Date.now() - startTimeRef.current) / 1000;
-    // Exponential growth
     const currentMult = Math.pow(1.1, elapsed * 2);
     
     if (currentMult >= crashPoint) {
@@ -44,7 +42,7 @@ export default function Crash() {
     }
 
     setMultiplier(currentMult);
-    gameLoopRef.current = requestAnimationFrame(updateMultiplier);
+    gameLoopRef.current = requestAnimationFrame(() => updateMultiplier());
   };
 
   const handleCashout = () => {

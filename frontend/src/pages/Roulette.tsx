@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, History, Trophy, Info } from 'lucide-react';
+import { Wallet, Coins, History, Trophy } from 'lucide-react';
 
 const ROULETTE_NUMBERS = [
   { n: 0, color: 'green' },
