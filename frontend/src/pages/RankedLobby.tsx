@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, Swords, Zap, Shield, Users } from 'lucide-react';
+import { socket } from '../App';
 
 const GAMES = [
   { id: 'crash', name: 'Crash PvP', icon: Zap, desc: 'Hold your nerve. Last one to cash out before the crash wins the pot.', players: 452 },
@@ -13,16 +14,36 @@ export default function RankedLobby() {
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
-  const handleQueue = () => {
-    setIsSearching(true);
-    setTimeout(() => {
+  useEffect(() => {
+    // Listen for match_found
+    socket.on('match_found', (data: { matchId: string; opponent: string }) => {
       setIsSearching(false);
       if (selectedGame === 'dice') {
-        navigate('/ranked/dice');
+        navigate(`/ranked/dice/${data.matchId}`);
       } else {
         alert("Match found! Joining game...");
       }
-    }, 2500);
+    });
+
+    return () => {
+      socket.off('match_found');
+    };
+  }, [navigate, selectedGame]);
+
+  const handleQueue = () => {
+    setIsSearching(true);
+    // Send join queue event to backend
+    socket.emit('join_queue', {
+      userId: 'GuestPlayer_' + Math.floor(Math.random() * 1000), // mock userId
+      rank: 1842, // mock ELO
+      gameType: selectedGame,
+      stake: 0.5 // mock stake
+    });
+  };
+
+  const handleCancelQueue = () => {
+    setIsSearching(false);
+    socket.emit('leave_queue');
   };
 
   return (
@@ -93,7 +114,7 @@ export default function RankedLobby() {
                   <p className="text-gray-400 mt-2 font-mono">Estimated time: 00:15</p>
                 </div>
                 <button 
-                  onClick={() => setIsSearching(false)}
+                  onClick={handleCancelQueue}
                   className="btn-secondary mt-4"
                 >
                   Cancel Matchmaking

@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Swords, User, CheckCircle2 } from 'lucide-react';
+import { socket } from '../App';
 
 export default function PvPDice() {
+  const { matchId } = useParams<{ matchId: string }>();
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'finished'>('waiting');
   const [myRoll, setMyRoll] = useState<number | null>(null);
   const [opponentRoll, setOpponentRoll] = useState<number | null>(null);
   const [isRolling, setIsRolling] = useState(false);
   const [winner, setWinner] = useState<'me' | 'opponent' | 'draw' | null>(null);
+  const [opponentHasRolled, setOpponentHasRolled] = useState(false);
 
   // Simulation data
   const stake = 0.5;
@@ -14,32 +18,51 @@ export default function PvPDice() {
   const winnerPayout = pot * 0.8;
 
   useEffect(() => {
-    // Simulate opponent joining after 2 seconds
-    const timer = setTimeout(() => {
+    if (!matchId) return;
+
+    // Join room
+    socket.emit('join_match', matchId);
+
+    // Both players joined, we can start
+    socket.on('player_joined', () => {
       setGameState('playing');
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
+    });
 
-  const handleRoll = () => {
-    if (gameState !== 'playing' || myRoll !== null) return;
-    
-    setIsRolling(true);
+    socket.on('opponent_rolled', () => {
+      setOpponentHasRolled(true);
+    });
 
-    // Simulate roll animation delay and network
-    setTimeout(() => {
-      const myResult = Math.floor(Math.random() * 100) + 1;
-      const oppResult = Math.floor(Math.random() * 100) + 1; // Simulate opponent rolling at the same time
-      
-      setMyRoll(myResult);
-      setOpponentRoll(oppResult);
+    socket.on('match_result', (data: { p1: any, p2: any }) => {
       setIsRolling(false);
       setGameState('finished');
       
-      if (myResult > oppResult) setWinner('me');
-      else if (oppResult > myResult) setWinner('opponent');
+      const myData = data.p1.socketId === socket.id ? data.p1 : data.p2;
+      const oppData = data.p1.socketId === socket.id ? data.p2 : data.p1;
+      
+      setMyRoll(myData.roll);
+      setOpponentRoll(oppData.roll);
+
+      if (myData.roll > oppData.roll) setWinner('me');
+      else if (oppData.roll > myData.roll) setWinner('opponent');
       else setWinner('draw');
-    }, 1500);
+    });
+
+    return () => {
+      socket.off('player_joined');
+      socket.off('opponent_rolled');
+      socket.off('match_result');
+    };
+  }, [matchId]);
+
+  const handleRoll = () => {
+    if (gameState !== 'playing' || myRoll !== null || !matchId) return;
+    
+    setIsRolling(true);
+
+    const result = Math.floor(Math.random() * 100) + 1;
+    setMyRoll(result); // Show locally instantly
+
+    socket.emit('submit_roll', { matchId, roll: result });
   };
 
   return (
@@ -151,7 +174,9 @@ export default function PvPDice() {
                <CheckCircle2 className="w-5 h-5" /> Rolled
              </div>
             ) : gameState === 'playing' ? (
-              <div className="text-gray-400 font-medium text-sm animate-pulse">Waiting for opponent to roll...</div>
+              <div className="text-gray-400 font-medium text-sm animate-pulse">
+                {opponentHasRolled ? 'Opponent has rolled!' : 'Waiting for opponent to roll...'}
+              </div>
             ) : null}
           </div>
 

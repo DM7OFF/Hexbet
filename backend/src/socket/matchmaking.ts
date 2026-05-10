@@ -10,6 +10,7 @@ interface Player {
 
 const queue: Player[] = [];
 const activeMatches: Record<string, { p1: Player; p2: Player; gameType: string; stake: number }> = {};
+const matchRolls: Record<string, { p1Roll?: number; p2Roll?: number }> = {};
 
 export function setupMatchmaking(io: Server) {
   io.on('connection', (socket: Socket) => {
@@ -28,6 +29,43 @@ export function setupMatchmaking(io: Server) {
       if (index !== -1) {
         queue.splice(index, 1);
         console.log(`Player left queue: ${socket.id}`);
+      }
+    });
+
+    socket.on('join_match', (matchId: string) => {
+      socket.join(matchId);
+      console.log(`Socket ${socket.id} joined match ${matchId}`);
+      // Notify the room that a player joined/is ready
+      io.to(matchId).emit('player_joined', { socketId: socket.id });
+    });
+
+    socket.on('submit_roll', (data: { matchId: string; roll: number }) => {
+      const match = activeMatches[data.matchId];
+      if (!match) return;
+
+      if (!matchRolls[data.matchId]) {
+        matchRolls[data.matchId] = {};
+      }
+
+      if (match.p1.socketId === socket.id) matchRolls[data.matchId].p1Roll = data.roll;
+      else if (match.p2.socketId === socket.id) matchRolls[data.matchId].p2Roll = data.roll;
+
+      // Broadcast to room that opponent rolled
+      socket.to(data.matchId).emit('opponent_rolled');
+
+      const rolls = matchRolls[data.matchId];
+
+      if (rolls.p1Roll !== undefined && rolls.p2Roll !== undefined) {
+        // Both rolled, evaluate
+        setTimeout(() => {
+          io.to(data.matchId).emit('match_result', {
+            p1: { userId: match.p1.userId, socketId: match.p1.socketId, roll: rolls.p1Roll },
+            p2: { userId: match.p2.userId, socketId: match.p2.socketId, roll: rolls.p2Roll }
+          });
+          // Cleanup
+          delete activeMatches[data.matchId];
+          delete matchRolls[data.matchId];
+        }, 1000); // Small delay for animation
       }
     });
 
