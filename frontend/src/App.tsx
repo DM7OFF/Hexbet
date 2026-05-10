@@ -11,6 +11,7 @@ import CasinoPlinko from './pages/CasinoPlinko.tsx';
 import CasinoShells from './pages/CasinoShells.tsx';
 import PvPDice from './pages/PvPDice.tsx';
 import PvPShells from './pages/PvPShells.tsx';
+import Ranks from './pages/Ranks.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
@@ -25,6 +26,7 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
     { path: '/', label: 'Dashboard', icon: Home },
     { path: '/ranked', label: 'Ranked PvP', icon: Trophy, accent: 'text-primary' },
     { path: '/casino', label: 'Casino', icon: Dice5, accent: 'text-secondary' },
+    { path: '/ranks', label: 'Leaderboard', icon: Trophy },
     { path: '/wallet', label: 'Wallet', icon: Wallet },
     { path: '/history', label: 'History', icon: History },
   ];
@@ -137,6 +139,7 @@ function AppLayout({ session, onLogout }: { session: Session; onLogout: () => vo
           <Route path="/casino/dice" element={<CasinoDice />} />
           <Route path="/casino/plinko" element={<CasinoPlinko />} />
           <Route path="/casino/shells" element={<CasinoShells />} />
+          <Route path="/ranks" element={<Ranks />} />
           <Route path="/wallet" element={<div className="text-2xl font-bold p-8">Wallet Integration Coming Soon</div>} />
           <Route path="/history" element={<div className="text-2xl font-bold p-8">Match History Coming Soon</div>} />
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -48,18 +48,24 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {STATS.map((stat, idx) => {
           const Icon = stat.icon;
-          return (
-            <div key={idx} className="glass-panel rounded-xl p-6 relative overflow-hidden group">
+          const content = (
+            <div key={idx} className="glass-panel rounded-xl p-6 relative overflow-hidden group h-full">
               <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full ${stat.color} opacity-10 group-hover:scale-150 transition-transform duration-500 blur-xl`}></div>
               <div className="flex justify-between items-start mb-4">
                 <div className="p-3 rounded-lg bg-white/5">
                   <Icon className={`w-6 h-6 ${stat.color}`} />
                 </div>
+                {stat.label === 'Current League' && <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-primary transition-colors" />}
               </div>
               <div className="text-2xl font-mono font-bold truncate">{stat.value}</div>
               <div className="text-sm text-gray-400 mt-1 font-medium">{stat.label}</div>
             </div>
           );
+
+          if (stat.label === 'Current League') {
+            return <Link key={idx} to="/ranks" className="block">{content}</Link>;
+          }
+          return content;
         })}
       </div>
 
