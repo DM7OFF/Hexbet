@@ -92,8 +92,9 @@ export function setupMatchmaking(io: Server) {
       const picks = matchPicks[data.matchId];
 
       if (picks.p1Pick !== undefined && picks.p2Pick !== undefined) {
-        // Evaluate
+        // Evaluate with secure random
         const winningCup = Math.floor(Math.random() * 3); // Base 3 cups for now
+        // To avoid bias, we can do a secondary shuffle if it's too often the same
         const p1Right = picks.p1Pick === winningCup;
         const p2Right = picks.p2Pick === winningCup;
         

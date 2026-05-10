@@ -3,7 +3,7 @@ import { Trophy, BarChart2, RefreshCw } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const HOUSE_EDGE = 1.5;
+const HOUSE_EDGE = 3.0; // Increased house edge to lower multipliers and increase casino profit
 
 export default function CasinoShells() {
   const [betAmount, setBetAmount] = useState<number>(10);
@@ -28,9 +28,13 @@ export default function CasinoShells() {
     setWinningIndex(null);
     setSelectedIndex(null);
 
-    // Shuffle logic
+    // Shuffle logic with extra randomization to ensure no bias
     setTimeout(() => {
-      const realWinningIndex = Math.floor(Math.random() * cupsCount);
+      // Use a more robust randomization approach
+      const randomValues = new Uint32Array(1);
+      window.crypto.getRandomValues(randomValues);
+      const realWinningIndex = randomValues[0] % cupsCount;
+      
       setWinningIndex(realWinningIndex);
       setGameState('picking');
     }, 2000);
