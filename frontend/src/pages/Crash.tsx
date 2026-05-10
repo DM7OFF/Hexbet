@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, History, AlertCircle, BarChart2 } from 'lucide-react';
+import { Wallet, Coins, History, AlertCircle } from 'lucide-react';
 import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function Crash() {

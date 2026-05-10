@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trophy, BarChart2, RefreshCw, Zap } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { Trophy, RefreshCw, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useBalance } from '../context/BalanceContext.tsx';
@@ -24,7 +23,6 @@ export default function CasinoShells() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [cups, setCups] = useState<number[]>([]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
-  const [historyData, setHistoryData] = useState<{ roll: number; profit: number }[]>([{ roll: 0, profit: 0 }]);
 
   // Auto Mode State
   const [isAuto, setIsAuto] = useState(false);
@@ -148,7 +146,6 @@ export default function CasinoShells() {
 
   const resetStats = () => {
     setStats({ wins: 0, losses: 0, totalProfit: 0 });
-    setHistoryData([{ roll: 0, profit: 0 }]);
   };
 
   return (

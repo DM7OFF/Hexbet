@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Coins, BarChart2, Play, Square, Zap } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Coins, Play, Square, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Constants & Data ---
@@ -53,7 +52,6 @@ export default function CasinoPlinko() {
   const resetStats = () => {
     setStats({ wins: 0, losses: 0, totalProfit: 0 });
   };
-  const [historyData, setHistoryData] = useState<{ roll: number; profit: number }[]>([{ roll: 0, profit: 0 }]);
   
   // Auto Mode
   const [isAuto, setIsAuto] = useState(false);

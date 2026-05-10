@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, History, Trophy, BarChart2 } from 'lucide-react';
+import { Wallet, Coins, History, Trophy } from 'lucide-react';
 import StatsFloater from '../components/StatsFloater.tsx';
 
 const ROULETTE_NUMBERS = [
