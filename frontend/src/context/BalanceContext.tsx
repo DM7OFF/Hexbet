@@ -77,41 +77,70 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
   };
 
   const recordWager = (amount: number, isRanked: boolean = false) => {
-    // Increment games played
-    setGamesPlayed(prevGames => {
-      const nextGames = prevGames + 1;
-      const gamesGoal = LEAGUE_GAMES_GOALS[league];
-      
-      // Update wagered amount in parallel (need to sync both)
+    // Increment ranked games played only if it's a ranked match
+    if (isRanked) {
+      setGamesPlayed(prevGames => {
+        const nextGames = prevGames + 1;
+        const gamesGoal = LEAGUE_GAMES_GOALS[league];
+        
+        // Update wagered amount in parallel
+        setWageredAmount(prevWagered => {
+          const nextWagered = prevWagered + amount;
+          const wagerGoal = LEAGUE_WAGER_GOALS[league];
+
+          // Check for Rank Up (Both conditions must be met)
+          if (nextWagered >= wagerGoal && nextGames >= gamesGoal) {
+            const currentIndex = LEAGUE_ORDER.indexOf(league);
+            if (currentIndex < LEAGUE_ORDER.length - 1) {
+              const nextLeague = LEAGUE_ORDER[currentIndex + 1];
+              const rewardKey = `${league}_${nextLeague}`;
+              const reward = LEAGUE_REWARDS[rewardKey] || 0;
+              
+              // Execute Rank Up
+              setTimeout(() => {
+                setLeague(nextLeague);
+                setWageredAmount(0);
+                setGamesPlayed(0);
+                updateBalance(reward);
+                alert(`🏆 LEAGUE UP! You are now ${nextLeague}. Reward: +${reward} COINS`);
+              }, 100);
+              
+              return 0;
+            }
+          }
+          return nextWagered;
+        });
+
+        return nextGames;
+      });
+    } else {
+      // For Casino games, only update wagered amount (it contributes to goal, but doesn't count as a match)
       setWageredAmount(prevWagered => {
         const nextWagered = prevWagered + amount;
         const wagerGoal = LEAGUE_WAGER_GOALS[league];
+        const gamesGoal = LEAGUE_GAMES_GOALS[league];
 
-        // Check for Rank Up (Both conditions must be met)
-        if (nextWagered >= wagerGoal && nextGames >= gamesGoal) {
+        // Still check for rank up if games played requirement was already met before
+        if (nextWagered >= wagerGoal && gamesPlayed >= gamesGoal) {
           const currentIndex = LEAGUE_ORDER.indexOf(league);
           if (currentIndex < LEAGUE_ORDER.length - 1) {
             const nextLeague = LEAGUE_ORDER[currentIndex + 1];
             const rewardKey = `${league}_${nextLeague}`;
             const reward = LEAGUE_REWARDS[rewardKey] || 0;
             
-            // Execute Rank Up
             setTimeout(() => {
               setLeague(nextLeague);
-              setWageredAmount(0); // Reset wager progress
-              setGamesPlayed(0);   // Reset games progress
+              setWageredAmount(0);
+              setGamesPlayed(0);
               updateBalance(reward);
               alert(`🏆 LEAGUE UP! You are now ${nextLeague}. Reward: +${reward} COINS`);
             }, 100);
-            
             return 0;
           }
         }
         return nextWagered;
       });
-
-      return nextGames;
-    });
+    }
 
     // 2. Update XP
     const xpGain = isRanked ? 25 : 10;

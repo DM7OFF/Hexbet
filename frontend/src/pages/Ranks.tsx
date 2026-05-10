@@ -169,7 +169,7 @@ export default function Ranks() {
                     <div className="text-xs text-white font-bold">{rank.wagerPerLevel.toLocaleString()}</div>
                   </div>
                   <div className="p-3 rounded-xl bg-surface/50 border border-white/5 space-y-1">
-                    <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Matches</div>
+                    <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Ranked</div>
                     <div className="text-xs text-white font-bold">{rank.gamesGoalPerLevel}</div>
                   </div>
                 </div>

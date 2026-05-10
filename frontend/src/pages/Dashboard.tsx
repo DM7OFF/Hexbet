@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function Dashboard() {
-  const { balance, league, level, xp, wageredAmount, wagerGoal, gamesPlayed, gamesGoal } = useBalance();
-  const xpToLevel = level * 100;
+  const { balance, league, level, wageredAmount, wagerGoal, gamesPlayed, gamesGoal } = useBalance();
   
   const STATS = [
     { label: 'Current Balance', value: `${balance.toFixed(2)} COINS`, icon: Wallet, color: 'text-success' },
@@ -47,7 +46,7 @@ export default function Dashboard() {
 
           <div className="space-y-2">
             <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-              <span>Games Requirement</span>
+              <span>Ranked Matches Requirement</span>
               <span>{gamesPlayed} / {gamesGoal} Matches</span>
             </div>
             <div className="h-2 w-full bg-surface rounded-full overflow-hidden border border-white/5">
