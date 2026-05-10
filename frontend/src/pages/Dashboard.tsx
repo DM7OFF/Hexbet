@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function Dashboard() {
-  const { balance, league, level, xp, wageredAmount, wagerGoal } = useBalance();
+  const { balance, league, level, xp, wageredAmount, wagerGoal, gamesPlayed, gamesGoal } = useBalance();
   const xpToLevel = level * 100;
   
   const STATS = [
     { label: 'Current Balance', value: `${balance.toFixed(2)} COINS`, icon: Wallet, color: 'text-success' },
+    { label: 'Games Played', value: `${gamesPlayed}/${gamesGoal}`, icon: Activity, color: 'text-warning' },
     { label: 'Win Rate', value: '54.2%', icon: Target, color: 'text-secondary' },
-    { label: 'Experience', value: `${xp}/${xpToLevel} XP`, icon: Activity, color: 'text-warning' },
     { label: 'Current League', value: `${league}`, icon: Trophy, color: 'text-primary' },
   ];
 
@@ -21,6 +21,7 @@ export default function Dashboard() {
   ];
 
   const wagerPercentage = (wageredAmount / wagerGoal) * 100;
+  const gamesPercentage = (gamesPlayed / gamesGoal) * 100;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">
@@ -30,18 +31,33 @@ export default function Dashboard() {
           <p className="text-gray-400 mt-2 text-lg">You are currently Level {level} in the {league} League.</p>
         </div>
         
-        <div className="glass-panel p-4 rounded-xl border-primary/20 flex flex-col gap-2 min-w-[250px]">
-          <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-            <span>Next League Progress</span>
-            <span>{wageredAmount.toFixed(0)} / {wagerGoal} Wagered</span>
+        <div className="glass-panel p-6 rounded-2xl border-primary/20 flex flex-col gap-4 min-w-[300px]">
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              <span>Wager Progress</span>
+              <span>{wageredAmount.toFixed(0)} / {wagerGoal}</span>
+            </div>
+            <div className="h-2 w-full bg-surface rounded-full overflow-hidden border border-white/5">
+              <div 
+                className="h-full bg-gradient-to-r from-success to-secondary transition-all duration-1000" 
+                style={{ width: `${wagerPercentage}%` }}
+              ></div>
+            </div>
           </div>
-          <div className="h-2 w-full bg-surface rounded-full overflow-hidden border border-white/5">
-            <div 
-              className="h-full bg-gradient-to-r from-success to-secondary transition-all duration-1000" 
-              style={{ width: `${wagerPercentage}%` }}
-            ></div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+              <span>Games Requirement</span>
+              <span>{gamesPlayed} / {gamesGoal} Matches</span>
+            </div>
+            <div className="h-2 w-full bg-surface rounded-full overflow-hidden border border-white/5">
+              <div 
+                className="h-full bg-gradient-to-r from-warning to-primary transition-all duration-1000" 
+                style={{ width: `${gamesPercentage}%` }}
+              ></div>
+            </div>
           </div>
-          <p className="text-[9px] text-gray-500 text-center italic">Wager {wagerGoal - wageredAmount} more to reach next Rank & increase Max Gain!</p>
+          <p className="text-[9px] text-gray-500 text-center italic">Meet both requirements to reach the next Sub-Rank!</p>
         </div>
       </div>
 

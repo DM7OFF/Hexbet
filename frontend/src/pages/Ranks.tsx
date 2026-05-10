@@ -9,6 +9,7 @@ const RANKS_INFO = [
     color: 'from-orange-400 to-orange-700',
     baseMaxGain: 500,
     wagerPerLevel: 200,
+    gamesGoalPerLevel: 5,
     rewardPerTier: 0,
     perks: ['Standard Support', 'Basic Multipliers']
   },
@@ -19,6 +20,7 @@ const RANKS_INFO = [
     color: 'from-gray-300 to-gray-500',
     baseMaxGain: 1000,
     wagerPerLevel: 1000,
+    gamesGoalPerLevel: 10,
     rewardPerTier: 100,
     perks: ['Increased Max Gain', 'Exclusive Badge']
   },
@@ -29,6 +31,7 @@ const RANKS_INFO = [
     color: 'from-yellow-400 to-yellow-600',
     baseMaxGain: 2500,
     wagerPerLevel: 5000,
+    gamesGoalPerLevel: 25,
     rewardPerTier: 500,
     perks: ['Priority Support', 'Custom Avatar Border']
   },
@@ -39,6 +42,7 @@ const RANKS_INFO = [
     color: 'from-blue-400 to-blue-600',
     baseMaxGain: 5000,
     wagerPerLevel: 20000,
+    gamesGoalPerLevel: 50,
     rewardPerTier: 2500,
     perks: ['VIP Lounge Access', 'Monthly Bonus']
   },
@@ -49,6 +53,7 @@ const RANKS_INFO = [
     color: 'from-cyan-400 to-purple-600',
     baseMaxGain: 10000,
     wagerPerLevel: 250000,
+    gamesGoalPerLevel: 100,
     rewardPerTier: 10000,
     perks: ['Personal VIP Host', 'Instant Withdrawals']
   }
@@ -158,10 +163,14 @@ export default function Ranks() {
                   <div className="font-mono font-bold text-success">+{rank.baseMaxGain} COINS</div>
                 </div>
                 
-                <div className="space-y-2">
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Wager per Sub-Rank</div>
-                  <div className="text-xs text-gray-300 font-medium">
-                    {rank.wagerPerLevel.toLocaleString()} COINS
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl bg-surface/50 border border-white/5 space-y-1">
+                    <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Wager</div>
+                    <div className="text-xs text-white font-bold">{rank.wagerPerLevel.toLocaleString()}</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-surface/50 border border-white/5 space-y-1">
+                    <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Matches</div>
+                    <div className="text-xs text-white font-bold">{rank.gamesGoalPerLevel}</div>
                   </div>
                 </div>
 
