@@ -18,7 +18,7 @@ export default function CasinoDice() {
   const [stopOnLoss, setStopOnLoss] = useState<number>(0);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     if (autoRunning && !rolling) {
       if (autoRollCount > 0 && currentAutoCount >= autoRollCount) {
         setAutoRunning(false);
