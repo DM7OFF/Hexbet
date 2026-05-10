@@ -262,10 +262,10 @@ export default function CasinoShells() {
 
             <div className="p-4 bg-surface/50 rounded-xl border border-white/5 space-y-1">
               <div className="flex justify-between items-center">
-                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Potential Win</div>
+                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Potential Profit</div>
                 <div className="text-[8px] text-warning font-bold uppercase tracking-widest">Max Gain: {MAX_GAIN}</div>
               </div>
-              <div className="text-xl font-mono font-bold text-success">{Math.min(betAmount * multiplier, betAmount + MAX_GAIN).toFixed(2)} COINS</div>
+              <div className="text-xl font-mono font-bold text-success">+{potentialProfit.toFixed(2)} COINS</div>
               <div className="text-xs text-gray-400">{multiplier.toFixed(2)}x Multiplier</div>
             </div>
 

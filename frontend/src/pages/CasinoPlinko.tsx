@@ -156,7 +156,7 @@ export default function CasinoPlinko() {
             <div className="space-y-2">
               <div className="flex justify-between items-center px-1">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Bet Amount</label>
-                <span className="text-[10px] text-warning font-bold uppercase tracking-wider">Max Gain: 10000</span>
+                <span className="text-[10px] text-warning font-bold uppercase tracking-wider">Max Gain: {MAX_GAIN}</span>
               </div>
               <div className="flex bg-surface rounded-lg border border-white/10 overflow-hidden">
                 <input
