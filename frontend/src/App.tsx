@@ -12,6 +12,9 @@ import CasinoShells from './pages/CasinoShells.tsx';
 import PvPDice from './pages/PvPDice.tsx';
 import PvPShells from './pages/PvPShells.tsx';
 import Ranks from './pages/Ranks.tsx';
+import Roulette from './pages/Roulette.tsx';
+import Crash from './pages/Crash.tsx';
+import Blackjack from './pages/Blackjack.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
@@ -139,6 +142,9 @@ function AppLayout({ session, onLogout }: { session: Session; onLogout: () => vo
           <Route path="/casino/dice" element={<CasinoDice />} />
           <Route path="/casino/plinko" element={<CasinoPlinko />} />
           <Route path="/casino/shells" element={<CasinoShells />} />
+          <Route path="/casino/roulette" element={<Roulette />} />
+          <Route path="/casino/crash" element={<Crash />} />
+          <Route path="/casino/blackjack" element={<Blackjack />} />
           <Route path="/ranks" element={<Ranks />} />
           <Route path="/wallet" element={<div className="text-2xl font-bold p-8">Wallet Integration Coming Soon</div>} />
           <Route path="/history" element={<div className="text-2xl font-bold p-8">Match History Coming Soon</div>} />

@@ -11,7 +11,7 @@ const RANKS_INFO = [
     wagerPerLevel: 200,
     gamesGoalPerLevel: 5,
     rewardPerTier: 0,
-    perks: ['Standard Support', 'Basic Multipliers']
+    perks: ['Standard Support', 'Basic Multipliers', 'Instant Withdrawals']
   },
   {
     category: 'Silver',
@@ -22,7 +22,7 @@ const RANKS_INFO = [
     wagerPerLevel: 1000,
     gamesGoalPerLevel: 10,
     rewardPerTier: 100,
-    perks: ['Increased Max Gain', 'Exclusive Badge']
+    perks: ['Increased Max Gain', 'Exclusive Badge', 'Instant Withdrawals']
   },
   {
     category: 'Gold',
@@ -33,7 +33,7 @@ const RANKS_INFO = [
     wagerPerLevel: 5000,
     gamesGoalPerLevel: 25,
     rewardPerTier: 500,
-    perks: ['Priority Support', 'Custom Avatar Border']
+    perks: ['Priority Support', 'Custom Avatar Border', 'Instant Withdrawals']
   },
   {
     category: 'Platinum',
@@ -44,7 +44,7 @@ const RANKS_INFO = [
     wagerPerLevel: 20000,
     gamesGoalPerLevel: 50,
     rewardPerTier: 2500,
-    perks: ['VIP Lounge Access', 'Monthly Bonus']
+    perks: ['VIP Lounge Access', 'Monthly Bonus', 'Instant Withdrawals']
   },
   {
     category: 'Diamond',

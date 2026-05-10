@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dice5, Zap, Swords, Coins, Play, Trophy } from 'lucide-react';
+import { Dice5, Zap, Swords, Coins, Play, Trophy, Spade } from 'lucide-react';
 
 const CASINO_GAMES = [
   { id: 'crash', name: 'House Crash', icon: Zap, desc: 'Classic crash. Multiply your crypto instantly.', houseEdge: '1%' },
@@ -7,6 +7,7 @@ const CASINO_GAMES = [
   { id: 'plinko', name: 'Plinko', icon: Coins, desc: 'Drop the ball. Watch your multiplier grow.', houseEdge: '1.5%' },
   { id: 'shells', name: 'Shell Game', icon: Trophy, desc: 'Find the ball under the cups. High multipliers.', houseEdge: '1.5%' },
   { id: 'roulette', name: 'Cyber Roulette', icon: Swords, desc: 'Classic table game with a modern twist.', houseEdge: '2.7%' },
+  { id: 'blackjack', name: 'Blackjack', icon: Spade, desc: 'Beat the dealer to 21. Standard 3:2 rules.', houseEdge: '0.5%' },
 ];
 
 import { useNavigate } from 'react-router-dom';
