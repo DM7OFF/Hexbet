@@ -15,12 +15,64 @@ export default function CasinoShells() {
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
   const [historyData, setHistoryData] = useState<{ roll: number; profit: number }[]>([{ roll: 0, profit: 0 }]);
 
-  const multiplier = cupsCount * (1 - HOUSE_EDGE / 100);
-  const potentialProfit = betAmount * multiplier - betAmount;
+  // Auto Mode State
+  const [isAuto, setIsAuto] = useState(false);
+  const [autoRunning, setAutoRunning] = useState(false);
+  const [autoRollCount, setAutoRollCount] = useState<number>(0);
+  const [currentAutoCount, setCurrentAutoCount] = useState(0);
+  const [stopOnProfit, setStopOnProfit] = useState<number>(0);
+  const [stopOnLoss, setStopOnLoss] = useState<number>(0);
+  const [autoPickStrategy, setAutoPickStrategy] = useState<'random' | 'fixed'>('random');
 
   useEffect(() => {
     setCups(Array.from({ length: cupsCount }, (_, i) => i));
   }, [cupsCount]);
+
+  // Auto Mode Logic
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    if (autoRunning && gameState === 'idle') {
+      if (autoRollCount > 0 && currentAutoCount >= autoRollCount) {
+        setAutoRunning(false);
+        return;
+      }
+      if (stopOnProfit > 0 && stats.totalProfit >= stopOnProfit) {
+        setAutoRunning(false);
+        return;
+      }
+      if (stopOnLoss > 0 && stats.totalProfit <= -stopOnLoss) {
+        setAutoRunning(false);
+        return;
+      }
+
+      timeout = setTimeout(() => {
+        startShuffle();
+        setCurrentAutoCount(prev => prev + 1);
+      }, 500);
+    }
+    return () => clearTimeout(timeout);
+  }, [autoRunning, gameState, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss]);
+
+  // Auto Pick Logic
+  useEffect(() => {
+    if (autoRunning && gameState === 'picking') {
+      const pickIndex = autoPickStrategy === 'random' 
+        ? Math.floor(Math.random() * cupsCount)
+        : 0;
+      
+      setTimeout(() => handlePick(pickIndex), 1000);
+    }
+  }, [autoRunning, gameState, autoPickStrategy, cupsCount]);
+
+  // Auto Reset Logic
+  useEffect(() => {
+    if (autoRunning && gameState === 'revealing') {
+      setTimeout(() => reset(), 2000);
+    }
+  }, [autoRunning, gameState]);
+
+  const multiplier = cupsCount * (1 - HOUSE_EDGE / 100);
+  const potentialProfit = betAmount * multiplier - betAmount;
 
   const startShuffle = () => {
     if (betAmount <= 0) return;
@@ -80,15 +132,35 @@ export default function CasinoShells() {
         {/* Controls */}
         <div className="lg:col-span-1 space-y-6">
           <div className="glass-panel p-6 rounded-2xl space-y-6">
+            {/* Auto / Manual Toggle */}
+            <div className="flex bg-surface rounded-lg p-1 border border-white/10">
+              <button 
+                onClick={() => setIsAuto(false)} 
+                className={`flex-1 py-2 rounded text-sm font-bold transition-all ${!isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+              >
+                Manual
+              </button>
+              <button 
+                onClick={() => { setIsAuto(true); setAutoRunning(false); setCurrentAutoCount(0); }} 
+                className={`flex-1 py-2 rounded text-sm font-bold transition-all ${isAuto ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
+              >
+                Auto
+              </button>
+            </div>
+
             <div className="space-y-2">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Bet Amount</label>
-              <input
-                type="number"
-                value={betAmount}
-                onChange={(e) => setBetAmount(Number(e.target.value))}
-                disabled={gameState !== 'idle' && gameState !== 'revealing'}
-                className="w-full bg-surface border border-white/10 p-3 rounded-lg text-white font-mono focus:border-primary outline-none disabled:opacity-50"
-              />
+              <div className="flex bg-surface rounded-lg border border-white/10 overflow-hidden">
+                <input
+                  type="number"
+                  value={betAmount}
+                  onChange={(e) => setBetAmount(Number(e.target.value))}
+                  disabled={autoRunning || (gameState !== 'idle' && gameState !== 'revealing' && !isAuto)}
+                  className="w-full bg-transparent p-3 text-white font-mono focus:outline-none disabled:opacity-50"
+                />
+                <button onClick={() => setBetAmount(prev => prev / 2)} disabled={autoRunning} className="px-3 hover:bg-white/5 text-sm font-bold text-gray-400 border-l border-white/10 transition-colors disabled:opacity-50">1/2</button>
+                <button onClick={() => setBetAmount(prev => prev * 2)} disabled={autoRunning} className="px-3 hover:bg-white/5 text-sm font-bold text-gray-400 border-l border-white/10 transition-colors disabled:opacity-50">x2</button>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -98,7 +170,7 @@ export default function CasinoShells() {
                   <button
                     key={n}
                     onClick={() => setCupsCount(n)}
-                    disabled={gameState !== 'idle' && gameState !== 'revealing'}
+                    disabled={autoRunning || (gameState !== 'idle' && gameState !== 'revealing' && !isAuto)}
                     className={`py-2 rounded-lg font-bold border transition-all ${
                       cupsCount === n ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-white/5 text-gray-400'
                     } disabled:opacity-50`}
@@ -109,23 +181,75 @@ export default function CasinoShells() {
               </div>
             </div>
 
+            {/* Auto Settings */}
+            {isAuto && (
+              <div className="space-y-4 pt-4 border-t border-white/10 animate-in fade-in duration-300">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pick Strategy</label>
+                  <div className="flex bg-surface rounded-lg p-1 border border-white/10">
+                    <button 
+                      onClick={() => setAutoPickStrategy('random')} 
+                      className={`flex-1 py-1.5 rounded text-[10px] font-bold transition-all ${autoPickStrategy === 'random' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
+                    >
+                      Random
+                    </button>
+                    <button 
+                      onClick={() => setAutoPickStrategy('fixed')} 
+                      className={`flex-1 py-1.5 rounded text-[10px] font-bold transition-all ${autoPickStrategy === 'fixed' ? 'bg-primary/20 text-primary' : 'text-gray-500 hover:text-white'}`}
+                    >
+                      Cup 1
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-2">Number of Games</label>
+                  <input type="number" value={autoRollCount} onChange={e => setAutoRollCount(Number(e.target.value))} disabled={autoRunning} className="w-full bg-surface border border-white/10 p-2 rounded text-white font-mono focus:border-primary outline-none disabled:opacity-50" placeholder="0 = infinite" />
+                  <p className="text-[10px] text-gray-500 mt-1">0 for infinite games</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-2">On Profit</label>
+                    <input type="number" value={stopOnProfit} onChange={e => setStopOnProfit(Number(e.target.value))} disabled={autoRunning} className="w-full bg-surface border border-white/10 p-2 rounded text-white font-mono focus:border-primary outline-none disabled:opacity-50" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-2">On Loss</label>
+                    <input type="number" value={stopOnLoss} onChange={e => setStopOnLoss(Number(e.target.value))} disabled={autoRunning} className="w-full bg-surface border border-white/10 p-2 rounded text-white font-mono focus:border-primary outline-none disabled:opacity-50" />
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="p-4 bg-surface/50 rounded-xl border border-white/5 space-y-1">
               <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Potential Win</div>
               <div className="text-xl font-mono font-bold text-success">{(betAmount * multiplier).toFixed(2)} COINS</div>
               <div className="text-xs text-gray-400">{multiplier.toFixed(2)}x Multiplier</div>
             </div>
 
-            {gameState === 'idle' || gameState === 'revealing' ? (
-              <button 
-                onClick={gameState === 'revealing' ? reset : startShuffle}
-                className="btn-primary w-full py-4 text-lg font-bold shadow-[0_0_30px_rgba(255,42,95,0.3)]"
-              >
-                {gameState === 'revealing' ? 'PLAY AGAIN' : 'SHUFFLE & START'}
-              </button>
+            {!isAuto ? (
+              gameState === 'idle' || gameState === 'revealing' ? (
+                <button 
+                  onClick={gameState === 'revealing' ? reset : startShuffle}
+                  className="btn-primary w-full py-4 text-lg font-bold shadow-[0_0_30px_rgba(255,42,95,0.3)]"
+                >
+                  {gameState === 'revealing' ? 'PLAY AGAIN' : 'SHUFFLE & START'}
+                </button>
+              ) : (
+                <div className="w-full py-4 rounded-xl bg-white/5 text-center font-bold text-gray-500 flex items-center justify-center gap-2">
+                  {gameState === 'shuffling' ? <><RefreshCw className="w-5 h-5 animate-spin" /> Shuffling...</> : 'Pick a cup!'}
+                </div>
+              )
             ) : (
-              <div className="w-full py-4 rounded-xl bg-white/5 text-center font-bold text-gray-500 flex items-center justify-center gap-2">
-                {gameState === 'shuffling' ? <><RefreshCw className="w-5 h-5 animate-spin" /> Shuffling...</> : 'Pick a cup!'}
-              </div>
+              <button 
+                onClick={() => setAutoRunning(!autoRunning)}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 flex justify-center items-center gap-2 ${
+                  autoRunning
+                    ? 'bg-danger text-white shadow-[0_0_30px_rgba(255,50,50,0.3)] hover:bg-danger/80'
+                    : 'btn-primary shadow-[0_0_30px_rgba(255,42,95,0.3)] hover:shadow-[0_0_50px_rgba(255,42,95,0.5)]'
+                }`}
+              >
+                {autoRunning ? 'STOP AUTO' : 'START AUTO'}
+              </button>
             )}
           </div>
         </div>
