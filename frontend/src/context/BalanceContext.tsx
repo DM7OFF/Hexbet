@@ -1,30 +1,41 @@
 import React, { createContext, useContext, useState } from 'react';
 
-export type League = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+export type League = 
+  | 'Bronze V' | 'Bronze IV' | 'Bronze III' | 'Bronze II' | 'Bronze I'
+  | 'Silver V' | 'Silver IV' | 'Silver III' | 'Silver II' | 'Silver I'
+  | 'Gold V' | 'Gold IV' | 'Gold III' | 'Gold II' | 'Gold I'
+  | 'Platinum V' | 'Platinum IV' | 'Platinum III' | 'Platinum II' | 'Platinum I'
+  | 'Diamond III' | 'Diamond II' | 'Diamond I';
 
-const LEAGUE_ORDER: League[] = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
+const LEAGUE_ORDER: League[] = [
+  'Bronze V', 'Bronze IV', 'Bronze III', 'Bronze II', 'Bronze I',
+  'Silver V', 'Silver IV', 'Silver III', 'Silver II', 'Silver I',
+  'Gold V', 'Gold IV', 'Gold III', 'Gold II', 'Gold I',
+  'Platinum V', 'Platinum IV', 'Platinum III', 'Platinum II', 'Platinum I',
+  'Diamond III', 'Diamond II', 'Diamond I'
+];
 
 const LEAGUE_MAX_GAINS: Record<League, number> = {
-  Bronze: 500,
-  Silver: 1000,
-  Gold: 2500,
-  Platinum: 5000,
-  Diamond: 10000
+  'Bronze V': 500, 'Bronze IV': 550, 'Bronze III': 600, 'Bronze II': 650, 'Bronze I': 700,
+  'Silver V': 1000, 'Silver IV': 1100, 'Silver III': 1200, 'Silver II': 1300, 'Silver I': 1400,
+  'Gold V': 2500, 'Gold IV': 2700, 'Gold III': 2900, 'Gold II': 3100, 'Gold I': 3300,
+  'Platinum V': 5000, 'Platinum IV': 5500, 'Platinum III': 6000, 'Platinum II': 6500, 'Platinum I': 7000,
+  'Diamond III': 10000, 'Diamond II': 15000, 'Diamond I': 25000
 };
 
 const LEAGUE_WAGER_GOALS: Record<League, number> = {
-  Bronze: 1000,
-  Silver: 5000,
-  Gold: 25000,
-  Platinum: 100000,
-  Diamond: 1000000 // Ultimate goal
+  'Bronze V': 200, 'Bronze IV': 200, 'Bronze III': 200, 'Bronze II': 200, 'Bronze I': 200,
+  'Silver V': 1000, 'Silver IV': 1000, 'Silver III': 1000, 'Silver II': 1000, 'Silver I': 1000,
+  'Gold V': 5000, 'Gold IV': 5000, 'Gold III': 5000, 'Gold II': 5000, 'Gold I': 5000,
+  'Platinum V': 20000, 'Platinum IV': 20000, 'Platinum III': 20000, 'Platinum II': 20000, 'Platinum I': 20000,
+  'Diamond III': 250000, 'Diamond II': 250000, 'Diamond I': 500000
 };
 
 const LEAGUE_REWARDS: Record<string, number> = {
-  'Bronze_Silver': 100,
-  'Silver_Gold': 500,
-  'Gold_Platinum': 2500,
-  'Platinum_Diamond': 10000
+  'Bronze I_Silver V': 100,
+  'Silver I_Gold V': 500,
+  'Gold I_Platinum V': 2500,
+  'Platinum I_Diamond III': 10000
 };
 
 interface BalanceContextType {
@@ -45,7 +56,7 @@ const BalanceContext = createContext<BalanceContextType | undefined>(undefined);
 export function BalanceProvider({ children }: { children: React.ReactNode }) {
   const [balance, setBalance] = useState<number>(1000);
   const [isLoading] = useState(false);
-  const [league, setLeague] = useState<League>('Bronze');
+  const [league, setLeague] = useState<League>('Bronze V');
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
   const [wageredAmount, setWageredAmount] = useState(0);

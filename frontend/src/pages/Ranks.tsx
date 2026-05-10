@@ -3,49 +3,54 @@ import { useBalance } from '../context/BalanceContext.tsx';
 
 const RANKS_INFO = [
   {
-    name: 'Bronze',
+    category: 'Bronze',
+    levels: ['V', 'IV', 'III', 'II', 'I'],
     icon: Shield,
     color: 'from-orange-400 to-orange-700',
-    maxGain: 500,
-    wagerRequired: 0,
-    reward: 0,
+    baseMaxGain: 500,
+    wagerPerLevel: 200,
+    rewardPerTier: 0,
     perks: ['Standard Support', 'Basic Multipliers']
   },
   {
-    name: 'Silver',
+    category: 'Silver',
+    levels: ['V', 'IV', 'III', 'II', 'I'],
     icon: Medal,
     color: 'from-gray-300 to-gray-500',
-    maxGain: 1000,
-    wagerRequired: 1000,
-    reward: 100,
+    baseMaxGain: 1000,
+    wagerPerLevel: 1000,
+    rewardPerTier: 100,
     perks: ['Increased Max Gain', 'Exclusive Badge']
   },
   {
-    name: 'Gold',
+    category: 'Gold',
+    levels: ['V', 'IV', 'III', 'II', 'I'],
     icon: Star,
     color: 'from-yellow-400 to-yellow-600',
-    maxGain: 2500,
-    wagerRequired: 5000,
-    reward: 500,
-    perks: ['Priority Support', 'Custom Avatar Border', 'Weekly Cashback']
+    baseMaxGain: 2500,
+    wagerPerLevel: 5000,
+    rewardPerTier: 500,
+    perks: ['Priority Support', 'Custom Avatar Border']
   },
   {
-    name: 'Platinum',
+    category: 'Platinum',
+    levels: ['V', 'IV', 'III', 'II', 'I'],
     icon: Zap,
     color: 'from-blue-400 to-blue-600',
-    maxGain: 5000,
-    wagerRequired: 25000,
-    reward: 2500,
-    perks: ['VIP Lounge Access', 'Monthly Bonus', 'Double XP Weekends']
+    baseMaxGain: 5000,
+    wagerPerLevel: 20000,
+    rewardPerTier: 2500,
+    perks: ['VIP Lounge Access', 'Monthly Bonus']
   },
   {
-    name: 'Diamond',
+    category: 'Diamond',
+    levels: ['III', 'II', 'I'],
     icon: Crown,
     color: 'from-cyan-400 to-purple-600',
-    maxGain: 10000,
-    wagerRequired: 100000,
-    reward: 10000,
-    perks: ['Personal VIP Host', 'Unlimited Max Gain Events', 'Instant Withdrawals']
+    baseMaxGain: 10000,
+    wagerPerLevel: 250000,
+    rewardPerTier: 10000,
+    perks: ['Personal VIP Host', 'Instant Withdrawals']
   }
 ];
 
@@ -110,53 +115,65 @@ export default function Ranks() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {RANKS_INFO.map((rank) => {
           const Icon = rank.icon;
-          const isCurrent = rank.name === currentLeague;
+          const isCurrentLeague = currentLeague.startsWith(rank.category);
           
           return (
             <div 
-              key={rank.name} 
+              key={rank.category} 
               className={`glass-panel rounded-3xl p-6 flex flex-col gap-6 transition-all duration-500 relative overflow-hidden group ${
-                isCurrent ? 'ring-2 ring-primary bg-primary/5 scale-105 z-10' : 'hover:bg-white/5 border-white/5'
+                isCurrentLeague ? 'ring-2 ring-primary bg-primary/5 scale-105 z-10' : 'hover:bg-white/5 border-white/5'
               }`}
             >
-              {isCurrent && (
-                <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-black px-3 py-1 rounded-bl-xl uppercase tracking-tighter">
-                  Current
-                </div>
-              )}
-              
               <div className="space-y-4">
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${rank.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500`}>
                   <Icon className="w-8 h-8 text-white drop-shadow-md" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-display font-bold">{rank.name}</h3>
-                  <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Tier Level</div>
+                  <h3 className="text-2xl font-display font-bold">{rank.category}</h3>
+                  <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">League Category</div>
                 </div>
+              </div>
+
+              {/* Sub-levels visualization */}
+              <div className="flex gap-1.5 justify-between">
+                {rank.levels.map(lv => {
+                  const levelName = `${rank.category} ${lv}`;
+                  const isLvCurrent = currentLeague === levelName;
+                  return (
+                    <div 
+                      key={lv} 
+                      className={`flex-1 h-8 rounded-md flex items-center justify-center text-[10px] font-black border transition-all ${
+                        isLvCurrent ? 'bg-primary border-primary text-white shadow-[0_0_10px_rgba(255,42,95,0.4)]' : 'bg-surface/50 border-white/5 text-gray-500'
+                      }`}
+                    >
+                      {lv}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="space-y-4 flex-1">
                 <div className="p-3 rounded-xl bg-surface/50 border border-white/5 space-y-1">
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Max Gain</div>
-                  <div className="font-mono font-bold text-success">+{rank.maxGain} COINS</div>
+                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Base Max Gain</div>
+                  <div className="font-mono font-bold text-success">+{rank.baseMaxGain} COINS</div>
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Requirements</div>
+                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Wager per Sub-Rank</div>
                   <div className="text-xs text-gray-300 font-medium">
-                    {rank.wagerRequired === 0 ? 'Starter Rank' : `Wager ${rank.wagerRequired.toLocaleString()} COINS`}
+                    {rank.wagerPerLevel.toLocaleString()} COINS
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest text-primary">Rank Up Reward</div>
+                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest text-primary">Leaping Reward</div>
                   <div className="text-sm font-black text-white">
-                    {rank.reward === 0 ? '---' : `+${rank.reward.toLocaleString()} COINS`}
+                    {rank.rewardPerTier === 0 ? '---' : `+${rank.rewardPerTier.toLocaleString()} COINS`}
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-white/5 space-y-2">
-                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-3">Perks</div>
+                  <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-3">Key Perks</div>
                   {rank.perks.map(perk => (
                     <div key={perk} className="flex items-start gap-2 text-[10px] text-gray-400 font-medium leading-tight">
                       <ChevronRight className="w-3 h-3 mt-0.5 text-primary shrink-0" />
