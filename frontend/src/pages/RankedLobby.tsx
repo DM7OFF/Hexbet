@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Trophy, Swords, Zap, Shield, Users } from 'lucide-react';
 
 const GAMES = [
@@ -8,16 +9,20 @@ const GAMES = [
 ];
 
 export default function RankedLobby() {
-  const [selectedGame, setSelectedGame] = useState(GAMES[0].id);
+  const [selectedGame, setSelectedGame] = useState(GAMES[1].id); // Default to dice
   const [isSearching, setIsSearching] = useState(false);
+  const navigate = useNavigate();
 
   const handleQueue = () => {
     setIsSearching(true);
     setTimeout(() => {
       setIsSearching(false);
-      // Simulate match found
-      alert("Match found! Joining game...");
-    }, 3000);
+      if (selectedGame === 'dice') {
+        navigate('/ranked/dice');
+      } else {
+        alert("Match found! Joining game...");
+      }
+    }, 2500);
   };
 
   return (

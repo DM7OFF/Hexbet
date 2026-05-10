@@ -5,6 +5,8 @@ import type { Session } from '@supabase/supabase-js';
 import Dashboard from './pages/Dashboard.tsx';
 import RankedLobby from './pages/RankedLobby.tsx';
 import Casino from './pages/Casino.tsx';
+import CasinoDice from './pages/CasinoDice.tsx';
+import PvPDice from './pages/PvPDice.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
@@ -107,7 +109,9 @@ function AppLayout({ session, onLogout }: { session: Session; onLogout: () => vo
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/ranked" element={<RankedLobby />} />
+          <Route path="/ranked/dice" element={<PvPDice />} />
           <Route path="/casino" element={<Casino />} />
+          <Route path="/casino/dice" element={<CasinoDice />} />
           <Route path="/wallet" element={<div className="text-2xl font-bold p-8">Wallet Integration Coming Soon</div>} />
           <Route path="/history" element={<div className="text-2xl font-bold p-8">Match History Coming Soon</div>} />
           <Route path="*" element={<Navigate to="/" replace />} />

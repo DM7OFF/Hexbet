@@ -8,8 +8,11 @@ const CASINO_GAMES = [
   { id: 'roulette', name: 'Cyber Roulette', icon: Swords, desc: 'Classic table game with a modern twist.', houseEdge: '2.7%' },
 ];
 
+import { useNavigate } from 'react-router-dom';
+
 export default function Casino() {
   const [activeTab, setActiveTab] = useState('all');
+  const navigate = useNavigate();
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -41,7 +44,11 @@ export default function Casino() {
         {CASINO_GAMES.map((game) => {
           const Icon = game.icon;
           return (
-            <div key={game.id} className="glass-panel rounded-xl overflow-hidden group cursor-pointer relative">
+            <div 
+              key={game.id} 
+              onClick={() => navigate(`/casino/${game.id}`)}
+              className="glass-panel rounded-xl overflow-hidden group cursor-pointer relative hover:-translate-y-1 transition-transform duration-300"
+            >
               {/* Game image placeholder */}
               <div className="h-40 bg-surface relative overflow-hidden flex items-center justify-center">
                 <div className="absolute inset-0 bg-secondary/10 group-hover:bg-secondary/20 transition-colors"></div>
