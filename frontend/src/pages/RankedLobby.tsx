@@ -12,6 +12,7 @@ const GAMES = [
 export default function RankedLobby() {
   const [selectedGame, setSelectedGame] = useState(GAMES[1].id); // Default to dice
   const [isSearching, setIsSearching] = useState(false);
+  const [stake, setStake] = useState<number>(0.1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function RankedLobby() {
       userId: 'GuestPlayer_' + Math.floor(Math.random() * 1000), // mock userId
       rank: 1842, // mock ELO
       gameType: selectedGame,
-      stake: 0.5 // mock stake
+      stake: stake
     });
   };
 
@@ -129,7 +130,11 @@ export default function RankedLobby() {
                   </div>
                   <div className="grid grid-cols-4 gap-2">
                     {['0.01', '0.05', '0.1', '0.5'].map(val => (
-                      <button key={val} className="py-2 bg-surface border border-white/10 rounded-lg hover:border-primary hover:text-primary transition-colors font-mono font-bold">
+                      <button 
+                        key={val} 
+                        onClick={() => setStake(Number(val))}
+                        className={`py-2 bg-surface border rounded-lg hover:border-primary hover:text-primary transition-colors font-mono font-bold ${stake === Number(val) ? 'border-primary text-primary shadow-[0_0_10px_rgba(255,42,95,0.2)]' : 'border-white/10'}`}
+                      >
                         {val}
                       </button>
                     ))}
@@ -137,6 +142,8 @@ export default function RankedLobby() {
                   <div className="relative">
                     <input 
                       type="number" 
+                      value={stake}
+                      onChange={(e) => setStake(Number(e.target.value))}
                       placeholder="Custom Amount" 
                       className="w-full bg-surface border border-white/10 rounded-lg py-3 px-4 outline-none focus:border-primary transition-colors font-mono"
                     />
