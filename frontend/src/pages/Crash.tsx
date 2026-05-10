@@ -10,7 +10,7 @@ export default function Crash() {
   const [history, setHistory] = useState<number[]>([]);
   const [cashoutAt, setCashoutAt] = useState<number | null>(null);
   const [crashPoint, setCrashPoint] = useState(0);
-  const gameLoopRef = useRef<number>();
+  const gameLoopRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
 
   const startNextGame = () => {
