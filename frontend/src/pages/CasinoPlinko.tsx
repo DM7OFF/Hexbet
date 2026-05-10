@@ -131,8 +131,11 @@ export default function CasinoPlinko() {
           <Coins className="w-8 h-8" />
         </div>
         <div>
-          <h2 className="text-3xl font-display font-bold">Plinko</h2>
-          <p className="text-gray-400">Drop the ball and multiply your coins. 1.5% House Edge.</p>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-display font-bold">Plinko</h2>
+            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: 1.5%</span>
+          </div>
+          <p className="text-gray-400 mt-1">Drop the ball and multiply your coins.</p>
         </div>
       </div>
 

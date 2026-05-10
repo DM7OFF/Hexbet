@@ -42,34 +42,36 @@ export default function Casino() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {CASINO_GAMES.map((game) => {
           const Icon = game.icon;
           return (
             <div 
               key={game.id} 
               onClick={() => navigate(`/casino/${game.id}`)}
-              className="glass-panel rounded-xl overflow-hidden group cursor-pointer relative hover:-translate-y-1 transition-transform duration-300"
+              className="group cursor-pointer relative"
             >
-              {/* Game image placeholder */}
-              <div className="h-40 bg-surface relative overflow-hidden flex items-center justify-center">
-                <div className="absolute inset-0 bg-secondary/10 group-hover:bg-secondary/20 transition-colors"></div>
-                <Icon className="w-16 h-16 text-secondary/50 group-hover:text-secondary group-hover:scale-110 transition-all duration-500" />
+              <div className="aspect-[4/5] rounded-[32px] bg-card/40 border border-white/[0.03] overflow-hidden relative transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] group-hover:border-primary/20">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 z-10"></div>
                 
-                {/* Overlay Play Button */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/50 backdrop-blur-sm">
-                  <div className="w-12 h-12 rounded-full bg-secondary text-background flex items-center justify-center translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-[0_0_20px_rgba(0,240,255,0.6)]">
-                    <Play className="w-5 h-5 ml-1" />
+                {/* Game Icon/Visual */}
+                <div className="absolute inset-0 flex items-center justify-center p-8">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <Icon className="w-20 h-20 text-white/10 group-hover:text-primary transition-all duration-500 group-hover:scale-110 relative z-10" />
                   </div>
                 </div>
-              </div>
-              
-              <div className="p-5">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold font-display text-lg group-hover:text-secondary transition-colors">{game.name}</h3>
-                  <span className="text-xs font-bold text-success bg-success/10 px-2 py-1 rounded">Edge: {game.houseEdge}</span>
+
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+                  <h3 className="font-display font-bold text-lg md:text-xl text-white group-hover:text-primary transition-colors leading-tight">
+                    {game.name}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-success"></div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-success">Play Now</span>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-400">{game.desc}</p>
               </div>
             </div>
           );

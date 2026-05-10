@@ -64,7 +64,10 @@ export default function Crash() {
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h2 className="text-4xl font-display font-bold text-secondary">Crash <span className="text-gray-500 text-xl">Moon</span></h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-4xl font-display font-bold text-secondary">Crash <span className="text-gray-500 text-xl">Moon</span></h2>
+            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: 1%</span>
+          </div>
           <p className="text-gray-400 mt-2">Cash out before the graph crashes to win!</p>
         </div>
         <div className="glass-panel px-6 py-3 rounded-2xl flex items-center gap-4 border-secondary/20">

@@ -68,7 +68,10 @@ export default function Roulette() {
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h2 className="text-4xl font-display font-bold">Roulette <span className="text-primary text-xl">Casino</span></h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-4xl font-display font-bold">Roulette <span className="text-primary text-xl">Casino</span></h2>
+            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: 2.7%</span>
+          </div>
           <p className="text-gray-400 mt-2">European style roulette with instant multipliers.</p>
         </div>
         <div className="glass-panel px-6 py-3 rounded-2xl flex items-center gap-4 border-primary/20">

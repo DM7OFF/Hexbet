@@ -152,8 +152,11 @@ export default function CasinoShells() {
           <Trophy className="w-8 h-8" />
         </div>
         <div>
-          <h2 className="text-3xl font-display font-bold">Shell Game</h2>
-          <p className="text-gray-400">Find the ball under the cups. {HOUSE_EDGE}% House Edge.</p>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-display font-bold">Shell Game</h2>
+            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: {HOUSE_EDGE}%</span>
+          </div>
+          <p className="text-gray-400 mt-1">Find the ball under the cups.</p>
         </div>
       </div>
 

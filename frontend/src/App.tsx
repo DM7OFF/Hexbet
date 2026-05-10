@@ -23,65 +23,85 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   const username = session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'Player';
-  const avatarUrl = session.user.user_metadata?.avatar_url;
 
-  const links = [
-    { path: '/', label: 'Dashboard', icon: Home },
-    { path: '/ranked', label: 'Ranked PvP', icon: Trophy, accent: 'text-primary' },
-    { path: '/casino', label: 'Casino', icon: Dice5, accent: 'text-secondary' },
-    { path: '/ranks', label: 'Leaderboard', icon: Trophy },
-    { path: '/wallet', label: 'Wallet', icon: Wallet },
-    { path: '/history', label: 'History', icon: History },
+  const menuSections = [
+    {
+      title: 'Main',
+      links: [
+        { path: '/', label: 'Lobby', icon: Home },
+        { path: '/ranked', label: 'Ranked PvP', icon: Trophy, color: 'text-primary' },
+        { path: '/ranks', label: 'Leaderboard', icon: Trophy },
+      ]
+    },
+    {
+      title: 'Casino',
+      links: [
+        { path: '/casino', label: 'All Games', icon: Dice5 },
+        { path: '/casino/dice', label: 'Dice', icon: Dice5 },
+        { path: '/casino/crash', label: 'Crash', icon: Zap },
+      ]
+    },
+    {
+      title: 'Account',
+      links: [
+        { path: '/wallet', label: 'Wallet', icon: Wallet },
+        { path: '/history', label: 'History', icon: History },
+      ]
+    }
   ];
 
   return (
-    <aside className="w-64 h-screen fixed left-0 top-0 border-r border-white/10 glass-panel flex flex-col z-50">
-      <div className="p-6 flex items-center gap-3 border-b border-white/10">
-        <Gamepad2 className="w-8 h-8 text-secondary" />
-        <h1 className="text-2xl font-display font-bold tracking-wider">HEX<span className="text-primary">BET</span></h1>
+    <aside className="w-60 h-screen fixed left-0 top-0 bg-background border-r border-white/[0.03] flex flex-col z-50">
+      <div className="p-6 mb-2">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+            <Gamepad2 className="w-6 h-6 text-white" />
+          </div>
+          <h1 className="text-xl font-display font-black tracking-tighter uppercase italic">
+            Hex<span className="text-primary">bet</span>
+          </h1>
+        </Link>
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
-        {links.map((link) => {
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-                isActive(link.path)
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              <Icon className={`w-5 h-5 ${link.accent || ''} ${isActive(link.path) ? 'animate-pulse' : ''}`} />
-              <span className="font-medium">{link.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="p-4 border-t border-white/10 space-y-2">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-surface/50 border border-white/5">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center overflow-hidden">
-            {avatarUrl
-              ? <img src={avatarUrl} alt={username} className="w-full h-full object-cover" />
-              : <User className="w-5 h-5" />
-            }
+      <div className="flex-1 overflow-y-auto px-4 py-2 space-y-8 scrollbar-hide">
+        {menuSections.map((section, idx) => (
+          <div key={idx} className="space-y-1">
+            <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 mb-2">{section.title}</h3>
+            {section.links.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
+                    isActive(link.path)
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-gray-400 hover:text-white hover:bg-white/[0.03]'
+                  }`}
+                >
+                  <Icon className={`w-4.5 h-4.5 ${isActive(link.path) ? 'text-primary' : 'text-gray-500 group-hover:text-white'} transition-colors`} />
+                  <span className="text-sm font-bold tracking-tight">{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
-          <div className="min-w-0">
-            <div className="text-sm font-bold truncate">{username}</div>
-            <div className="text-[10px] text-primary font-mono font-medium flex items-center gap-1">
-              <Shield className="w-3 h-3" />
-              {league} League (Lvl {level})
+        ))}
+      </div>
+
+      <div className="p-4 bg-white/[0.02] border-t border-white/[0.03]">
+        <div className="flex items-center gap-3 p-3 rounded-2xl bg-card/40 border border-white/[0.03]">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-accent flex items-center justify-center overflow-hidden shrink-0">
+            <User className="w-5 h-5 text-white" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-black truncate">{username}</div>
+            <div className="text-[10px] text-gray-500 font-bold flex items-center gap-1">
+              {league} • Lvl {level}
             </div>
           </div>
         </div>
-        <button
-          onClick={onLogout}
-          className="w-full text-xs text-gray-500 hover:text-red-400 transition-colors py-1"
-        >
-          Déconnexion
+        <button onClick={onLogout} className="w-full text-[10px] font-bold text-gray-600 hover:text-danger transition-colors py-3 uppercase tracking-widest">
+          Logout
         </button>
       </div>
     </aside>
@@ -89,38 +109,36 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
 }
 
 function Topbar() {
-  const { balance, xp, level } = useBalance();
-  const xpToLevel = level * 100;
-  const xpPercentage = (xp / xpToLevel) * 100;
+  const { balance, level } = useBalance();
   
   return (
-    <header className="h-20 ml-64 flex items-center justify-between px-8 border-b border-white/10 glass-panel sticky top-0 z-40">
-      <div className="flex items-center gap-6">
-        <div className="px-4 py-2 rounded-full bg-surface border border-white/10 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-success animate-pulse"></div>
-          <span className="text-sm font-medium text-gray-300">Server: Online</span>
-        </div>
-        
-        <div className="flex flex-col gap-1 w-48">
-          <div className="flex justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-            <span>Level {level}</span>
-            <span>{xp}/{xpToLevel} XP</span>
+    <header className="h-16 ml-60 flex items-center justify-between px-8 bg-background/80 backdrop-blur-xl border-b border-white/[0.03] sticky top-0 z-40">
+      <div className="flex items-center gap-4 flex-1 max-w-md">
+        <div className="relative w-full">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Gamepad2 className="h-4 w-4 text-gray-600" />
           </div>
-          <div className="h-1.5 w-full bg-surface rounded-full overflow-hidden border border-white/5">
-            <div 
-              className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500" 
-              style={{ width: `${xpPercentage}%` }}
-            ></div>
-          </div>
+          <input
+            type="text"
+            placeholder="Search games..."
+            className="block w-full pl-10 pr-3 py-2 bg-card/40 border border-white/[0.03] rounded-xl text-sm placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all"
+          />
         </div>
       </div>
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <div className="text-xs text-gray-400">Balance</div>
-            <div className="text-lg font-mono font-bold text-success">{balance.toFixed(2)} COINS</div>
+
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1 bg-card border border-white/[0.03] rounded-2xl p-1 shadow-inner">
+          <div className="px-4 py-1.5 rounded-xl bg-white/[0.03] flex items-center gap-2">
+            <Coins className="w-4 h-4 text-warning" />
+            <span className="text-sm font-mono font-black text-white">{balance.toFixed(2)}</span>
           </div>
-          <button className="btn-primary py-2 px-4 text-sm shadow-[0_0_15px_rgba(255,42,95,0.2)]">Deposit</button>
+          <button className="bg-primary hover:bg-primary/90 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95">
+            Deposit
+          </button>
+        </div>
+        
+        <div className="w-10 h-10 rounded-xl bg-card border border-white/[0.03] flex items-center justify-center text-xs font-black text-primary">
+          {level}
         </div>
       </div>
     </header>
@@ -132,7 +150,7 @@ function AppLayout({ session, onLogout }: { session: Session; onLogout: () => vo
     <div className="min-h-screen bg-background text-white font-sans">
       <Sidebar session={session} onLogout={onLogout} />
       <Topbar />
-      <main className="ml-64 p-8 min-h-[calc(100vh-5rem)]">
+      <main className="ml-60 p-8 min-h-[calc(100vh-4rem)]">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/ranked" element={<RankedLobby />} />

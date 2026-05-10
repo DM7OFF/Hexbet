@@ -7,14 +7,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0B0D17', // Deep futuristic space dark
-        surface: '#15192B',
-        primary: '#FF2A5F', // Neon red/pink
-        secondary: '#00F0FF', // Cyan
-        accent: '#7B2CBF', // Deep purple
-        success: '#00FF9D',
-        warning: '#FFB800',
-        danger: '#FF2A5F',
+        background: '#0a0a0c', // Darker, cleaner Toshi-style
+        surface: '#151518',
+        card: '#1e1e22',
+        primary: '#8b5cf6', // Soft purple
+        secondary: '#00f0ff',
+        accent: '#7c3aed',
+        success: '#10b981',
+        warning: '#f59e0b',
+        danger: '#ef4444',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

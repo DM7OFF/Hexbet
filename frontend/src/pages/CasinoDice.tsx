@@ -110,8 +110,11 @@ export default function CasinoDice() {
           <Dice5 className="w-8 h-8 text-secondary" />
         </div>
         <div>
-          <h2 className="text-3xl font-display font-bold">Provably Fair Dice</h2>
-          <p className="text-gray-400">Set your win chance and roll the dice. 1.5% House Edge.</p>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-display font-bold">Provably Fair Dice</h2>
+            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: 1.5%</span>
+          </div>
+          <p className="text-gray-400 mt-1">Set your win chance and roll the dice.</p>
         </div>
       </div>
 
