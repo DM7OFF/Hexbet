@@ -11,6 +11,7 @@ export default function PvPDice() {
   // Simulation data
   const stake = 0.5;
   const pot = stake * 2;
+  const winnerPayout = pot * 0.8;
 
   useEffect(() => {
     // Simulate opponent joining after 2 seconds
@@ -167,7 +168,7 @@ export default function PvPDice() {
               {winner === 'me' ? 'VICTORY!' : winner === 'opponent' ? 'DEFEAT' : 'DRAW'}
             </h2>
             <p className="text-xl text-gray-300 font-medium">
-              {winner === 'me' ? `You won ${pot.toFixed(2)} ETH` : winner === 'opponent' ? `You lost ${stake.toFixed(2)} ETH` : 'Stake returned'}
+              {winner === 'me' ? `You won ${winnerPayout.toFixed(2)} ETH` : winner === 'opponent' ? `You lost ${stake.toFixed(2)} ETH` : 'Stake returned'}
             </p>
             <div className="mt-8 flex gap-4">
               <button className="btn-secondary py-3 px-8 text-sm" onClick={() => window.location.href = '/ranked'}>Back to Lobby</button>
