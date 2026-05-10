@@ -24,6 +24,7 @@ export default function CasinoShells() {
   const [stopOnLoss, setStopOnLoss] = useState<number>(0);
   const [autoPickStrategy, setAutoPickStrategy] = useState<'random' | number>('random');
   const [isFastMode, setIsFastMode] = useState(false);
+  const [lastWinningIndex, setLastWinningIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setCups(Array.from({ length: cupsCount }, (_, i) => i));
@@ -87,12 +88,18 @@ export default function CasinoShells() {
 
     // Shuffle logic with extra randomization to ensure no bias
     setTimeout(() => {
+      let realWinningIndex: number;
+      
       // Use a more robust randomization approach
       const randomValues = new Uint32Array(1);
-      window.crypto.getRandomValues(randomValues);
-      const realWinningIndex = randomValues[0] % cupsCount;
+      
+      do {
+        window.crypto.getRandomValues(randomValues);
+        realWinningIndex = randomValues[0] % cupsCount;
+      } while (realWinningIndex === lastWinningIndex);
       
       setWinningIndex(realWinningIndex);
+      setLastWinningIndex(realWinningIndex);
       setGameState('picking');
     }, isFastMode ? 100 : 2000);
   };
