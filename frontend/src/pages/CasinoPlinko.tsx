@@ -33,8 +33,9 @@ interface Ball {
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function CasinoPlinko() {
-  const { balance, updateBalance } = useBalance();
+  const { balance, updateBalance, getMaxGain } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
+  const MAX_GAIN = getMaxGain();
 
   // Auto-adjust bet amount if it exceeds balance
   useEffect(() => {
@@ -80,7 +81,6 @@ export default function CasinoPlinko() {
     const bucketIndex = Math.round(currentIndex);
     const multiplier = multipliers[bucketIndex];
     const payout = betAmount * multiplier;
-    const MAX_GAIN = 10000;
     const profit = Math.min(payout - betAmount, MAX_GAIN);
     const actualPayout = betAmount + profit;
 

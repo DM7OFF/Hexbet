@@ -5,7 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function CasinoDice() {
-  const { balance, updateBalance } = useBalance();
+  const { balance, updateBalance, getMaxGain } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
 
   // Auto-adjust bet amount if it exceeds balance
@@ -59,7 +59,7 @@ export default function CasinoDice() {
   const HOUSE_EDGE = 1.5; // Adjusted to 1.5% as requested
   const MAX_CHANCE = 95; // Slightly reduced from 98
   const MIN_CHANCE = 2; // Slightly increased from 1
-  const MAX_GAIN = 10000; // Maximum profit allowed per bet
+  const MAX_GAIN = getMaxGain(); // Maximum profit allowed per bet based on league
 
   // Derived Values
   const multiplier = (100 - HOUSE_EDGE) / winChance;

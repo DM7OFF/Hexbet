@@ -10,10 +10,13 @@ const GAMES = [
   { id: 'cards', name: 'Card Battle', icon: Swords, desc: 'High-stakes card mechanics. Strategy meets luck in intense 1v1s.', players: 320 },
 ];
 
+import { useBalance } from '../context/BalanceContext.tsx';
+
 export default function RankedLobby() {
+  const { balance } = useBalance();
   const [selectedGame, setSelectedGame] = useState(GAMES[1].id); // Default to dice
   const [isSearching, setIsSearching] = useState(false);
-  const [stake, setStake] = useState<number>(0.1);
+  const [stake, setStake] = useState<number>(10);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -129,10 +132,10 @@ export default function RankedLobby() {
                 <div className="w-full max-w-md space-y-4">
                   <div className="flex justify-between text-sm font-bold text-gray-400">
                     <span>Select Stake</span>
-                    <span className="text-white">Balance: 2.450 ETH</span>
+                    <span className="text-white">Balance: {balance.toFixed(2)} COINS</span>
                   </div>
                   <div className="grid grid-cols-4 gap-2">
-                    {['0.01', '0.05', '0.1', '0.5'].map(val => (
+                    {['10', '50', '100', '500'].map(val => (
                       <button 
                         key={val} 
                         onClick={() => setStake(Number(val))}
@@ -150,7 +153,7 @@ export default function RankedLobby() {
                       placeholder="Custom Amount" 
                       className="w-full bg-surface border border-white/10 rounded-lg py-3 px-4 outline-none focus:border-primary transition-colors font-mono"
                     />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">ETH</span>
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">COINS</span>
                   </div>
                 </div>
                 

@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBalance } from '../context/BalanceContext.tsx';
 
 export default function CasinoShells() {
-  const { balance, updateBalance } = useBalance();
+  const { balance, updateBalance, getMaxGain } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
+  const MAX_GAIN = getMaxGain();
 
   // Auto-adjust bet amount if it exceeds balance
   useEffect(() => {
@@ -87,7 +88,6 @@ export default function CasinoShells() {
   }, [autoRunning, gameState, isFastMode]);
 
   const HOUSE_EDGE = 1.5;
-  const MAX_GAIN = 10000; // Maximum profit allowed per bet
   const multiplier = cupsCount * (1 - HOUSE_EDGE / 100);
   const potentialProfit = Math.min(betAmount * multiplier - betAmount, MAX_GAIN);
 
