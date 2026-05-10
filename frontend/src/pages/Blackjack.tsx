@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, Trophy, RotateCcw, BarChart2 } from 'lucide-react';
+import { Wallet, Coins, Trophy, RotateCcw } from 'lucide-react';
 import StatsFloater from '../components/StatsFloater.tsx';
 
 type Card = {

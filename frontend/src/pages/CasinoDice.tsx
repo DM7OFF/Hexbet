@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dice5, Trophy, RefreshCw, BarChart2, Play, Square, Zap } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Dice5, Trophy, RefreshCw, Play, Square, Zap } from 'lucide-react';
 
 import { useBalance } from '../context/BalanceContext.tsx';
 import StatsFloater from '../components/StatsFloater.tsx';
@@ -21,7 +20,6 @@ export default function CasinoDice() {
   const [lastRoll, setLastRoll] = useState<{ result: number; won: boolean; profit: number } | null>(null);
 
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
-  const [historyData, setHistoryData] = useState<{ roll: number; profit: number }[]>([{ roll: 0, profit: 0 }]);
 
   // Auto Mode State
   const [isAuto, setIsAuto] = useState(false);
@@ -90,7 +88,6 @@ export default function CasinoDice() {
         losses: prev.losses + (won ? 0 : 1),
         totalProfit: prev.totalProfit + profit
       }));
-      setHistoryData(prev => [...prev, { roll: prev.length, profit: stats.totalProfit + profit }].slice(-20));
       
       if (won) {
         updateBalance(actualProfit + betAmount); // Refund bet + profit
@@ -100,7 +97,6 @@ export default function CasinoDice() {
 
   const resetStats = () => {
     setStats({ wins: 0, losses: 0, totalProfit: 0 });
-    setHistoryData([{ roll: 0, profit: 0 }]);
   };
 
   return (
