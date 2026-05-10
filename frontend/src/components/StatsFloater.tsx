@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BarChart2, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
