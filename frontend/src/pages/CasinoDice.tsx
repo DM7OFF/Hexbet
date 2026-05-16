@@ -14,8 +14,9 @@ export default function CasinoDice() {
     }
   }, [balance, betAmount]);
 
-  const [sliderValue, setSliderValue] = useState<number>(50); // The "Roll Under" target
+  const [targetMultiplier, setTargetMultiplier] = useState<number>(2.0);
   const [multiplierInput, setMultiplierInput] = useState<string>('2.0000');
+  const [rollType, setRollType] = useState<'under' | 'over'>('under');
   const [rolling, setRolling] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ result: number; won: boolean; profit: number } | null>(null);
 
@@ -31,31 +32,36 @@ export default function CasinoDice() {
 
   // Constants
   const HOUSE_EDGE = 1.5;
-  const MAX_CHANCE = 95;
-  const MIN_CHANCE = 2;
   const MAX_GAIN = getMaxGain();
 
   // Derived Values
-  const multiplier = 100 / sliderValue;
-  const winChance = sliderValue * (100 - HOUSE_EDGE) / 100;
+  const multiplier = targetMultiplier;
+  const visualWinChance = (100 / targetMultiplier); 
+  const winChance = visualWinChance * (100 - HOUSE_EDGE) / 100;
   const potentialProfit = betAmount * multiplier - betAmount;
   const actualProfit = Math.min(potentialProfit, MAX_GAIN);
-  const rollUnder = sliderValue;
+  
+  // The visual number shown to the user (e.g. "Roll Under 49.25")
+  const rollTarget = rollType === 'under' ? winChance : (100 - winChance);
 
-  // Sync multiplier input when sliderValue changes
+  // Sync multiplier input
   useEffect(() => {
-    setMultiplierInput(multiplier.toFixed(4));
-  }, [sliderValue, multiplier]);
+    setMultiplierInput(targetMultiplier.toFixed(4));
+  }, [targetMultiplier]);
 
   const handleMultiplierChange = (val: string) => {
     setMultiplierInput(val);
     const num = parseFloat(val);
-    if (!isNaN(num) && num >= 1.05) { // 100 / 95 (max slider) ≈ 1.052
-      const newSliderValue = 100 / num;
-      if (newSliderValue >= MIN_CHANCE && newSliderValue <= MAX_CHANCE) {
-        setSliderValue(newSliderValue);
-      }
+    if (!isNaN(num) && num >= 1.0103 && num <= 49.25) { 
+      setTargetMultiplier(num);
     }
+  };
+
+  const handleSliderChange = (val: number) => {
+    // Slider maps to visual win chance (2% to 95%)
+    // val is the "visual" probability (e.g. 50)
+    const newMultiplier = 100 / val;
+    setTargetMultiplier(newMultiplier);
   };
 
   const handleRoll = useCallback(() => {
@@ -66,14 +72,17 @@ export default function CasinoDice() {
     updateBalance(-betAmount);
     recordWager(betAmount);
 
-    const mult = 100 / sliderValue;
-    const potProfit = betAmount * mult - betAmount;
+    const currentMultiplier = targetMultiplier;
+    const potProfit = betAmount * currentMultiplier - betAmount;
     const actualPft = Math.min(potProfit, MAX_GAIN);
-    const currentWinChance = sliderValue * (100 - HOUSE_EDGE) / 100;
+    
+    const vWinChance = 100 / currentMultiplier;
+    const cWinChance = vWinChance * (100 - HOUSE_EDGE) / 100;
+    const cRollTarget = rollType === 'under' ? cWinChance : (100 - cWinChance);
 
     setTimeout(() => {
       const result = parseFloat((Math.random() * 100).toFixed(2));
-      const won = result < currentWinChance;
+      const won = rollType === 'under' ? (result < cRollTarget) : (result > cRollTarget);
       const profit = won ? actualPft : -betAmount;
 
       setRolling(false);
@@ -86,7 +95,7 @@ export default function CasinoDice() {
       }
     }, isFastMode ? 50 : 600);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [betAmount, balance, sliderValue, isFastMode, MAX_GAIN]);
+  }, [betAmount, balance, targetMultiplier, rollType, isFastMode, MAX_GAIN]);
 
   // Auto Mode useEffect — depends on handleRoll, so must come AFTER it
   useEffect(() => {
@@ -298,30 +307,30 @@ export default function CasinoDice() {
                   {/* Custom Track Background */}
                   <div className="absolute top-8 left-0 right-0 h-4 bg-surface rounded-full overflow-hidden border border-white/5">
                     <div 
-                      className="absolute top-0 bottom-0 left-0 bg-success/80 border-r-2 border-white"
-                      style={{ width: `${sliderValue}%` }}
+                      className={`absolute top-0 bottom-0 ${rollType === 'under' ? 'left-0' : 'right-0'} bg-success/80 border-x-2 border-white`}
+                      style={{ width: `${winChance}%` }}
                     ></div>
                     <div 
-                      className="absolute top-0 bottom-0 right-0 bg-danger/80"
-                      style={{ width: `${100 - sliderValue}%` }}
+                      className={`absolute top-0 bottom-0 ${rollType === 'under' ? 'right-0' : 'left-0'} bg-danger/80`}
+                      style={{ width: `${100 - winChance}%` }}
                     ></div>
                   </div>
 
                   {/* HTML Range Input */}
                   <input 
                     type="range" 
-                    min={MIN_CHANCE} 
-                    max={MAX_CHANCE} 
-                    step="1"
-                    value={sliderValue}
-                    onChange={(e) => setSliderValue(Number(e.target.value))}
+                    min={2} 
+                    max={95} 
+                    step="0.01"
+                    value={visualWinChance}
+                    onChange={(e) => handleSliderChange(Number(e.target.value))}
                     className="w-full absolute top-7 opacity-0 cursor-pointer h-6"
                   />
                   
                   {/* Slider Thumb Visual (Controlled by State) */}
                   <div 
                     className="absolute top-5 w-8 h-10 bg-white rounded shadow-xl border-2 border-secondary flex flex-col items-center justify-center pointer-events-none transition-all"
-                    style={{ left: `calc(${sliderValue}% - 16px)` }}
+                    style={{ left: `calc(${rollType === 'under' ? winChance : (100 - winChance)}% - 16px)` }}
                   >
                     <div className="w-1 h-3 bg-secondary/50 rounded-full"></div>
                   </div>
@@ -342,10 +351,15 @@ export default function CasinoDice() {
                   </div>
                   <div className="bg-surface/50 rounded-xl p-4 border border-white/5 text-center flex flex-col justify-center">
                     <div className="flex justify-between items-center px-2 mb-1">
-                      <div className="text-gray-400 text-xs font-bold uppercase tracking-wider">Roll Under</div>
+                      <button 
+                        onClick={() => setRollType(rollType === 'under' ? 'over' : 'under')}
+                        className="text-gray-400 text-[10px] font-black uppercase tracking-wider hover:text-white transition-colors flex items-center gap-1"
+                      >
+                        Roll {rollType === 'under' ? 'Under' : 'Over'} <RefreshCw className="w-2 h-2" />
+                      </button>
                       <div className="text-[8px] text-warning font-bold uppercase">Max: {MAX_GAIN}</div>
                     </div>
-                    <div className="text-xl font-mono font-bold text-success">{rollUnder.toFixed(2)}</div>
+                    <div className="text-xl font-mono font-bold text-success">{rollTarget.toFixed(2)}</div>
                   </div>
                   <div className="bg-surface/50 rounded-xl p-4 border border-white/5 text-center">
                     <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Win Chance</div>
