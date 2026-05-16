@@ -14,7 +14,8 @@ export default function CasinoDice() {
     }
   }, [balance, betAmount]);
 
-  const [winChance, setWinChance] = useState<number>(50);
+  const [winChance, setWinChance] = useState<number>(49.25); // Default to 2x payout (98.5/2)
+  const [multiplierInput, setMultiplierInput] = useState<string>('2.0000');
   const [rolling, setRolling] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ result: number; won: boolean; profit: number } | null>(null);
 
@@ -34,11 +35,27 @@ export default function CasinoDice() {
   const MIN_CHANCE = 2;
   const MAX_GAIN = getMaxGain();
 
-  // Derived Values (used in UI and in handleRoll)
+  // Derived Values
   const multiplier = (100 - HOUSE_EDGE) / winChance;
   const potentialProfit = betAmount * multiplier - betAmount;
   const actualProfit = Math.min(potentialProfit, MAX_GAIN);
   const rollUnder = winChance;
+
+  // Sync multiplier input when winChance changes from slider
+  useEffect(() => {
+    setMultiplierInput(multiplier.toFixed(4));
+  }, [winChance, multiplier]);
+
+  const handleMultiplierChange = (val: string) => {
+    setMultiplierInput(val);
+    const num = parseFloat(val);
+    if (!isNaN(num) && num >= 1.0103) { // 98.5 / 97.5 ≈ 1.0103 for max 97.5% win chance
+      const newChance = (100 - HOUSE_EDGE) / num;
+      if (newChance >= MIN_CHANCE && newChance <= MAX_CHANCE) {
+        setWinChance(newChance);
+      }
+    }
+  };
 
   const handleRoll = useCallback(() => {
     if (betAmount <= 0 || betAmount > balance) return;
@@ -194,7 +211,7 @@ export default function CasinoDice() {
               <div className="flex justify-between items-center bg-background/50 border border-white/5 rounded-xl p-3">
                 <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Potential Win</span>
                 <span className="text-sm font-mono font-bold text-success">
-                  +{(betAmount * (99 / winChance)).toFixed(2)} COINS
+                  +{(betAmount * multiplier).toFixed(2)} COINS
                 </span>
               </div>
 
@@ -312,7 +329,14 @@ export default function CasinoDice() {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-surface/50 rounded-xl p-4 border border-white/5 text-center">
                     <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Multiplier</div>
-                    <div className="text-xl font-mono font-bold text-white">{multiplier.toFixed(4)}x</div>
+                    <input 
+                      type="number"
+                      step="0.01"
+                      value={multiplierInput}
+                      onChange={(e) => handleMultiplierChange(e.target.value)}
+                      disabled={autoRunning || rolling}
+                      className="w-full bg-transparent text-center text-xl font-mono font-bold text-white focus:outline-none"
+                    />
                   </div>
                   <div className="bg-surface/50 rounded-xl p-4 border border-white/5 text-center flex flex-col justify-center">
                     <div className="flex justify-between items-center px-2 mb-1">
