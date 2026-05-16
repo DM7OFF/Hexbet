@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart2, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -13,6 +13,14 @@ interface StatsFloaterProps {
 
 export default function StatsFloater({ stats, onReset }: StatsFloaterProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [profitHistory, setProfitHistory] = useState<number[]>([0]);
+
+  useEffect(() => {
+    setProfitHistory(prev => {
+      if (stats.wins === 0 && stats.losses === 0) return [0];
+      return [...prev, stats.totalProfit].slice(-50);
+    });
+  }, [stats.wins, stats.losses, stats.totalProfit]);
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-[264px] md:translate-x-0 z-40">
@@ -78,15 +86,41 @@ export default function StatsFloater({ stats, onReset }: StatsFloaterProps) {
 
               {/* Progress bar of win/loss ratio */}
               {(stats.wins > 0 || stats.losses > 0) && (
-                <div className="mt-3 h-1 w-full bg-white/5 rounded-full overflow-hidden flex">
-                  <div 
-                    className="h-full bg-success/50" 
-                    style={{ width: `${(stats.wins / (stats.wins + stats.losses)) * 100}%` }}
-                  />
-                  <div 
-                    className="h-full bg-danger/50" 
-                    style={{ width: `${(stats.losses / (stats.wins + stats.losses)) * 100}%` }}
-                  />
+                <>
+                  <div className="mt-4 flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-tighter mb-1.5">
+                    <span>Win Rate</span>
+                    <span className="text-white">{((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden flex">
+                    <div 
+                      className="h-full bg-success/50" 
+                      style={{ width: `${(stats.wins / (stats.wins + stats.losses)) * 100}%` }}
+                    />
+                    <div 
+                      className="h-full bg-danger/50" 
+                      style={{ width: `${(stats.losses / (stats.wins + stats.losses)) * 100}%` }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* SVG Graph */}
+              {profitHistory.length > 1 && (
+                <div className="mt-4 h-16 w-full relative border-t border-white/5 pt-3">
+                   <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
+                      {(() => {
+                        const min = Math.min(...profitHistory);
+                        const max = Math.max(...profitHistory);
+                        const range = max - min === 0 ? 1 : max - min;
+                        const points = profitHistory.map((p, i) => `${(i / (profitHistory.length - 1)) * 100},${100 - ((p - min) / range) * 100}`).join(' ');
+                        return (
+                          <>
+                            {min < 0 && max > 0 && <line x1="0" y1={100 - ((0 - min) / range) * 100} x2="100" y2={100 - ((0 - min) / range) * 100} stroke="rgba(255,255,255,0.2)" strokeDasharray="2 2" strokeWidth="1" />}
+                            <polyline points={points} fill="none" stroke="#00f0ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </>
+                        );
+                      })()}
+                   </svg>
                 </div>
               )}
             </motion.div>

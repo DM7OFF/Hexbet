@@ -12,7 +12,6 @@ export default function Limbo() {
   const [resultMultiplier, setResultMultiplier] = useState<number>(1.0);
   const [gameState, setGameState] = useState<'idle' | 'rolling' | 'win' | 'lose'>('idle');
   const [history, setHistory] = useState<{ mult: number; win: boolean }[]>([]);
-  const [profitHistory, setProfitHistory] = useState<number[]>([0]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
 
   const playLimbo = () => {
@@ -35,25 +34,22 @@ export default function Limbo() {
       if (isWin) {
         const winAmount = Math.min(betAmount * targetMultiplier, getMaxGain());
         updateBalance(winAmount);
-        setStats(prev => {
-          const newProfit = prev.totalProfit + (winAmount - betAmount);
-          setProfitHistory(h => [...h, newProfit].slice(-50));
-          return { ...prev, wins: prev.wins + 1, totalProfit: newProfit };
-        });
+        setStats(prev => ({ 
+          ...prev, 
+          wins: prev.wins + 1, 
+          totalProfit: prev.totalProfit + (winAmount - betAmount) 
+        }));
       } else {
-        setStats(prev => {
-          const newProfit = prev.totalProfit - betAmount;
-          setProfitHistory(h => [...h, newProfit].slice(-50));
-          return { ...prev, losses: prev.losses + 1, totalProfit: newProfit };
-        });
+        setStats(prev => ({ 
+          ...prev, 
+          losses: prev.losses + 1, 
+          totalProfit: prev.totalProfit - betAmount 
+        }));
       }
     }, 100); // Super fast instant feeling
   };
 
-  const resetStats = () => {
-    setStats({ wins: 0, losses: 0, totalProfit: 0 });
-    setProfitHistory([0]);
-  };
+  const resetStats = () => setStats({ wins: 0, losses: 0, totalProfit: 0 });
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
@@ -127,30 +123,23 @@ export default function Limbo() {
 
           <div className="p-4 rounded-xl bg-surface/50 border border-white/5 space-y-3">
             <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-              <AlertCircle className="w-3 h-3" /> Live Statistics
+              <AlertCircle className="w-3 h-3" /> Info
             </div>
-            <div className="h-24 w-full relative mt-2 border-b border-white/5 pb-2">
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-                {(() => {
-                  if (profitHistory.length < 2) return null;
-                  const min = Math.min(...profitHistory);
-                  const max = Math.max(...profitHistory);
-                  const range = max - min === 0 ? 1 : max - min;
-                  const points = profitHistory.map((p, i) => `${(i / (profitHistory.length - 1)) * 100},${100 - ((p - min) / range) * 100}`).join(' ');
-                  return (
-                    <>
-                      {min < 0 && max > 0 && <line x1="0" y1={100 - ((0 - min) / range) * 100} x2="100" y2={100 - ((0 - min) / range) * 100} stroke="rgba(255,255,255,0.2)" strokeDasharray="2 2" strokeWidth="1" />}
-                      <polyline points={points} fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </>
-                  );
-                })()}
-              </svg>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Potential Payout</span>
+              <span className="text-success font-bold">{(betAmount * targetMultiplier).toFixed(2)} COINS</span>
             </div>
-            <div className="flex justify-between text-sm pt-1">
-              <span className="text-gray-400">Total Profit</span>
-              <span className={`font-bold ${stats.totalProfit >= 0 ? 'text-success' : 'text-danger'}`}>
-                {stats.totalProfit > 0 ? '+' : ''}{stats.totalProfit.toFixed(2)} COINS
-              </span>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Net Profit</span>
+              <span className="text-success font-bold">+{(betAmount * targetMultiplier - betAmount).toFixed(2)} COINS</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">House Edge</span>
+              <span className="text-white font-bold">1.50%</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Max Payout</span>
+              <span className="text-white font-bold">{getMaxGain().toFixed(2)} COINS</span>
             </div>
           </div>
         </div>
