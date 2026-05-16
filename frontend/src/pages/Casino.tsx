@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dice5, Zap, Swords, Coins, Trophy, Spade } from 'lucide-react';
 
 const CASINO_GAMES = [
-  { id: 'limbo', name: 'Limbo', icon: Zap, desc: 'Target a multiplier and win instantly.', houseEdge: '5%' },
+  { id: 'limbo', name: 'Limbo', icon: Zap, desc: 'Target a multiplier and win instantly.', houseEdge: '1.5%' },
   { id: 'dice', name: 'Provably Fair Dice', icon: Dice5, desc: 'Set your win chance. Instant payouts.', houseEdge: '1%' },
   { id: 'plinko', name: 'Plinko', icon: Coins, desc: 'Drop the ball. Watch your multiplier grow.', houseEdge: '1.5%' },
   { id: 'shells', name: 'Shell Game', icon: Trophy, desc: 'Find the ball under the cups. High multipliers.', houseEdge: '1.5%' },

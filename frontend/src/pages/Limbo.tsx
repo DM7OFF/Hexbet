@@ -21,8 +21,8 @@ export default function Limbo() {
     recordWager(betAmount);
     
     setTimeout(() => {
-      // 5% house edge => 0.95 / Math.random()
-      const newMult = Math.min(1000, Math.max(1.00, 0.95 / Math.random()));
+      // 1.5% house edge => 0.985 / Math.random()
+      const newMult = Math.min(1000, Math.max(1.00, 0.985 / Math.random()));
       const isWin = newMult >= targetMultiplier;
       
       setResultMultiplier(newMult);
@@ -55,7 +55,7 @@ export default function Limbo() {
         <div>
           <div className="flex items-center gap-3">
             <h2 className="text-4xl font-display font-bold text-secondary">Limbo</h2>
-            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: 5%</span>
+            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: 1.5%</span>
           </div>
           <p className="text-gray-400 mt-2">Target a multiplier and see if the roll goes higher!</p>
         </div>
@@ -103,7 +103,7 @@ export default function Limbo() {
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-warning font-black">×</span>
             </div>
             <div className="text-xs text-gray-500 font-bold flex justify-between">
-              <span>Win Chance: {((0.95 / targetMultiplier) * 100).toFixed(2)}%</span>
+              <span>Win Chance: {((0.985 / targetMultiplier) * 100).toFixed(2)}%</span>
             </div>
           </div>
 
