@@ -15,6 +15,8 @@ import PvPShells from './pages/PvPShells.tsx';
 import Ranks from './pages/Ranks.tsx';
 import Roulette from './pages/Roulette.tsx';
 import Limbo from './pages/Limbo.tsx';
+import Mines from './pages/Mines.tsx';
+import Towers from './pages/Towers.tsx';
 import Blackjack from './pages/Blackjack.tsx';
 import StatsFloater from './components/StatsFloater.tsx';
 
@@ -41,6 +43,8 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
         { path: '/casino', label: 'All Games', icon: Dice5 },
         { path: '/casino/dice', label: 'Dice', icon: Dice5 },
         { path: '/casino/limbo', label: 'Limbo', icon: Zap },
+        { path: '/casino/mines', label: 'Mines', icon: Dice5 },
+        { path: '/casino/towers', label: 'Towers', icon: Dice5 },
       ]
     },
     {
@@ -176,6 +180,8 @@ function AppLayout({ session, onLogout }: { session: Session; onLogout: () => vo
           <Route path="/casino/shells" element={<CasinoShells />} />
           <Route path="/casino/roulette" element={<Roulette />} />
           <Route path="/casino/limbo" element={<Limbo />} />
+          <Route path="/casino/mines" element={<Mines />} />
+          <Route path="/casino/towers" element={<Towers />} />
           <Route path="/casino/blackjack" element={<Blackjack />} />
           <Route path="/ranks" element={<Ranks />} />
           <Route path="/wallet" element={<div className="text-2xl font-bold p-8">Wallet Integration Coming Soon</div>} />
