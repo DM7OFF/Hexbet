@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useBalance } from '../context/BalanceContext';
-import { Wallet, Coins, History, AlertCircle, Zap } from 'lucide-react';
+import { Wallet, Coins, History, Zap } from 'lucide-react';
 
 
 export default function Limbo() {
@@ -111,27 +111,7 @@ export default function Limbo() {
             </button>
           </div>
 
-          <div className="p-4 rounded-xl bg-surface/50 border border-white/5 space-y-3">
-            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-              <AlertCircle className="w-3 h-3" /> Info
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Potential Payout</span>
-              <span className="text-success font-bold">{(betAmount * targetMultiplier).toFixed(2)} COINS</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Net Profit</span>
-              <span className="text-success font-bold">+{(betAmount * targetMultiplier - betAmount).toFixed(2)} COINS</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">House Edge</span>
-              <span className="text-white font-bold">1.50%</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Max Payout</span>
-              <span className="text-white font-bold">{getMaxGain().toFixed(2)} COINS</span>
-            </div>
-          </div>
+
         </div>
 
         {/* Center: Result */}

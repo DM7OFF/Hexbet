@@ -15,8 +15,6 @@ export default function StatsFloater() {
     });
   }, [sessionStats.wins, sessionStats.losses, sessionStats.totalProfit]);
 
-  const graphColor = sessionStats.totalProfit >= 0 ? '#22c55e' : '#ef4444';
-
   return (
     <AnimatePresence>
       {isStatsFloaterOpen && (
@@ -66,9 +64,9 @@ export default function StatsFloater() {
                   className="p-5 pt-4 overflow-hidden cursor-default"
                   onPointerDownCapture={e => e.stopPropagation()}
                 >
-                  <div className="flex gap-6 mb-4">
+                  <div className="flex gap-6 mb-6">
                     <div className="space-y-0.5 flex-1">
-                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Profit</div>
+                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Net Profit</div>
                       <div className={`text-xl font-mono font-black ${sessionStats.totalProfit > 0 ? 'text-success' : sessionStats.totalProfit < 0 ? 'text-danger' : 'text-white'}`}>
                         {sessionStats.totalProfit > 0 ? '+' : ''}{sessionStats.totalProfit.toFixed(2)}
                       </div>
@@ -82,59 +80,58 @@ export default function StatsFloater() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center text-sm bg-white/5 p-3 rounded-xl border border-white/5">
+                  <div className="flex justify-between items-center text-sm bg-surface/50 p-3 rounded-xl border border-white/5 mb-6">
                     <div className="flex flex-col items-center flex-1">
                       <span className="text-[10px] font-bold text-gray-500 uppercase">Wins</span>
-                      <span className="font-mono font-black text-success/80 text-lg">{sessionStats.wins}</span>
+                      <span className="font-mono font-black text-white text-lg">{sessionStats.wins}</span>
                     </div>
                     <div className="w-[1px] h-8 bg-white/10"></div>
                     <div className="flex flex-col items-center flex-1">
                       <span className="text-[10px] font-bold text-gray-500 uppercase">Losses</span>
-                      <span className="font-mono font-black text-danger/80 text-lg">{sessionStats.losses}</span>
+                      <span className="font-mono font-black text-white text-lg">{sessionStats.losses}</span>
                     </div>
                   </div>
 
-                  {/* Progress bar of win/loss ratio */}
-                  {(sessionStats.wins > 0 || sessionStats.losses > 0) && (
-                    <>
-                      <div className="mt-5 flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-tighter mb-1.5">
-                        <span>Win Rate</span>
-                        <span className="text-white">{((sessionStats.wins / (sessionStats.wins + sessionStats.losses)) * 100).toFixed(1)}%</span>
-                      </div>
-                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden flex">
-                        <div 
-                          className="h-full bg-success/50" 
-                          style={{ width: `${(sessionStats.wins / (sessionStats.wins + sessionStats.losses)) * 100}%` }}
-                        />
-                        <div 
-                          className="h-full bg-danger/50" 
-                          style={{ width: `${(sessionStats.losses / (sessionStats.wins + sessionStats.losses)) * 100}%` }}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {/* SVG Graph */}
+                  {/* SVG Graph with Y/X axes */}
                   {profitHistory.length > 0 && (
-                    <div className="mt-5 h-24 w-full relative border-t border-white/5 pt-4">
-                       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-                          {(() => {
-                            const min = Math.min(...profitHistory);
-                            const max = Math.max(...profitHistory);
-                            const range = max - min === 0 ? 1 : max - min;
-                            const points = profitHistory.map((p, i) => {
-                              const x = (i / Math.max(1, profitHistory.length - 1)) * 100;
-                              const y = 100 - ((p - min) / range) * 100;
-                              return `${x},${y}`;
-                            }).join(' ');
-                            return (
-                              <>
-                                {min < 0 && max > 0 && <line x1="0" y1={100 - ((0 - min) / range) * 100} x2="100" y2={100 - ((0 - min) / range) * 100} stroke="rgba(255,255,255,0.2)" strokeDasharray="2 2" strokeWidth="1" />}
-                                <polyline points={points} fill="none" stroke={graphColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                              </>
-                            );
-                          })()}
-                       </svg>
+                    <div className="mt-2 h-32 w-full relative">
+                      <div className="absolute inset-0 flex">
+                        {/* Y-axis Labels */}
+                        <div className="w-12 h-full flex flex-col justify-between text-[8px] font-mono text-gray-500 pr-2 pb-4 pt-1 text-right">
+                          <span>{Math.max(...profitHistory).toFixed(0)}</span>
+                          <span>{((Math.max(...profitHistory) + Math.min(...profitHistory)) / 2).toFixed(0)}</span>
+                          <span>{Math.min(...profitHistory).toFixed(0)}</span>
+                        </div>
+                        
+                        {/* Graph Area */}
+                        <div className="flex-1 relative border-l border-b border-white/10 pb-4">
+                          <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible absolute inset-0">
+                            {(() => {
+                              const min = Math.min(...profitHistory);
+                              const max = Math.max(...profitHistory);
+                              const range = max - min === 0 ? 1 : max - min;
+                              const points = profitHistory.map((p, i) => {
+                                const x = (i / Math.max(1, profitHistory.length - 1)) * 100;
+                                const y = 100 - ((p - min) / range) * 100;
+                                return `${x},${y}`;
+                              }).join(' ');
+                              return (
+                                <>
+                                  {min < 0 && max > 0 && <line x1="0" y1={100 - ((0 - min) / range) * 100} x2="100" y2={100 - ((0 - min) / range) * 100} stroke="rgba(255,255,255,0.1)" strokeDasharray="2 2" strokeWidth="1" />}
+                                  <polyline points={points} fill="none" stroke="#0ea5e9" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </>
+                              );
+                            })()}
+                          </svg>
+                          
+                          {/* X-axis indicators */}
+                          <div className="absolute -bottom-4 left-0 right-0 flex justify-between text-[8px] font-mono text-gray-500">
+                            <span>0</span>
+                            <span>Bets</span>
+                            <span>{profitHistory.length}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </motion.div>
