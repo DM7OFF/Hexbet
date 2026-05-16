@@ -30,7 +30,7 @@ export default function CasinoDice() {
   const [isFastMode, setIsFastMode] = useState(false);
 
   // Constants
-  const HOUSE_EDGE = 1.0;
+  const HOUSE_EDGE = 1.5;
   const MAX_CHANCE = 95;
   const MIN_CHANCE = 2;
   const MAX_GAIN = getMaxGain();
