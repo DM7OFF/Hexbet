@@ -13,20 +13,26 @@ export default function Crash() {
   const [crashPoint, setCrashPoint] = useState(0);
   const gameLoopRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
+  const betAmountRef = useRef<number>(betAmount);
+  const crashPointRef = useRef<number>(0);
+  const cashedOutRef = useRef<boolean>(false);
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
 
   const startNextGame = () => {
     if (betAmount > balance) return;
     
+    betAmountRef.current = betAmount;
     updateBalance(-betAmount);
     recordWager(betAmount);
     
+    cashedOutRef.current = false;
     setMultiplier(1.0);
     setCashoutAt(null);
     setGameState('running');
     
     const newCrashPoint = 1 + (Math.random() * (Math.random() < 0.1 ? 10 : 2.5));
     setCrashPoint(newCrashPoint);
+    crashPointRef.current = newCrashPoint;
     
     startTimeRef.current = Date.now();
     gameLoopRef.current = requestAnimationFrame(() => updateMultiplier());
@@ -36,11 +42,14 @@ export default function Crash() {
     const elapsed = (Date.now() - startTimeRef.current) / 1000;
     const currentMult = Math.pow(1.1, elapsed * 2);
     
-    if (currentMult >= crashPoint) {
-      setGameState('crashed');
-      setHistory(prev => [parseFloat(crashPoint.toFixed(2)), ...prev].slice(0, 15));
-      setStats(prev => ({ ...prev, losses: prev.losses + 1, totalProfit: prev.totalProfit - betAmount }));
-      cancelAnimationFrame(gameLoopRef.current!);
+    if (currentMult >= crashPointRef.current) {
+      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+      // Only count as a loss if the player did NOT already cash out
+      if (!cashedOutRef.current) {
+        setGameState('crashed');
+        setHistory(prev => [parseFloat(crashPointRef.current.toFixed(2)), ...prev].slice(0, 15));
+        setStats(prev => ({ ...prev, losses: prev.losses + 1, totalProfit: prev.totalProfit - betAmountRef.current }));
+      }
       return;
     }
 
@@ -51,13 +60,18 @@ export default function Crash() {
   const handleCashout = () => {
     if (gameState !== 'running') return;
     
+    // Mark cashed out synchronously so the animation loop won't count it as a crash loss
+    cashedOutRef.current = true;
+    if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+
     const currentMult = multiplier;
     setCashoutAt(currentMult);
     setGameState('cashed_out');
+    setHistory(prev => [parseFloat(crashPointRef.current.toFixed(2)), ...prev].slice(0, 15));
     
-    const winAmount = Math.min(betAmount * currentMult, getMaxGain());
+    const winAmount = Math.min(betAmountRef.current * currentMult, getMaxGain());
     updateBalance(winAmount);
-    setStats(prev => ({ ...prev, wins: prev.wins + 1, totalProfit: prev.totalProfit + (winAmount - betAmount) }));
+    setStats(prev => ({ ...prev, wins: prev.wins + 1, totalProfit: prev.totalProfit + (winAmount - betAmountRef.current) }));
   };
 
   const resetStats = () => setStats({ wins: 0, losses: 0, totalProfit: 0 });
@@ -150,12 +164,22 @@ export default function Crash() {
               }`}>
                 {multiplier.toFixed(2)}x
               </div>
-              {gameState === 'crashed' && (
-                <div className="text-danger font-display font-bold text-2xl mt-4 animate-bounce">CRASHED!</div>
-              )}
               {gameState === 'cashed_out' && (
-                <div className="text-success font-display font-bold text-2xl mt-4">
-                  CASHED OUT AT {cashoutAt?.toFixed(2)}x
+                <div className="space-y-2 mt-4">
+                  <div className="text-success font-display font-bold text-2xl">
+                    CASHED OUT AT {cashoutAt?.toFixed(2)}x
+                  </div>
+                  <div className="text-xl font-mono font-bold text-white">
+                    +{(betAmount * (cashoutAt || 1) - betAmount).toFixed(2)} COINS
+                  </div>
+                </div>
+              )}
+              {gameState === 'crashed' && (
+                <div className="space-y-2 mt-4">
+                  <div className="text-danger font-display font-bold text-2xl animate-bounce">CRASHED!</div>
+                  <div className="text-xl font-mono font-bold text-white/50">
+                    -{betAmount.toFixed(2)} COINS
+                  </div>
                 </div>
               )}
             </div>

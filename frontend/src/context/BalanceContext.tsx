@@ -71,40 +71,43 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
   const [level, setLevel] = useState(1);
   const [wageredAmount, setWageredAmount] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
+  // Track gamesPlayed in a ref so we can read it from inside setState callbacks (avoids stale closure)
+  const gamesPlayedRef = React.useRef(0);
+
+  React.useEffect(() => {
+    gamesPlayedRef.current = gamesPlayed;
+  }, [gamesPlayed]);
 
   const updateBalance = (amount: number) => {
     setBalance(prev => prev + amount);
   };
 
   const recordWager = (amount: number, isRanked: boolean = false) => {
-    // Increment ranked games played only if it's a ranked match
     if (isRanked) {
       setGamesPlayed(prevGames => {
         const nextGames = prevGames + 1;
         const gamesGoal = LEAGUE_GAMES_GOALS[league];
-        
-        // Update wagered amount in parallel
+
         setWageredAmount(prevWagered => {
           const nextWagered = prevWagered + amount;
           const wagerGoal = LEAGUE_WAGER_GOALS[league];
 
-          // Check for Rank Up (Both conditions must be met)
           if (nextWagered >= wagerGoal && nextGames >= gamesGoal) {
             const currentIndex = LEAGUE_ORDER.indexOf(league);
             if (currentIndex < LEAGUE_ORDER.length - 1) {
               const nextLeague = LEAGUE_ORDER[currentIndex + 1];
               const rewardKey = `${league}_${nextLeague}`;
               const reward = LEAGUE_REWARDS[rewardKey] || 0;
-              
-              // Execute Rank Up
+
               setTimeout(() => {
                 setLeague(nextLeague);
                 setWageredAmount(0);
                 setGamesPlayed(0);
-                updateBalance(reward);
-                alert(`🏆 LEAGUE UP! You are now ${nextLeague}. Reward: +${reward} COINS`);
+                gamesPlayedRef.current = 0;
+                setBalance(prev => prev + reward);
+                console.log(`🏆 LEAGUE UP! You are now ${nextLeague}. Reward: +${reward} COINS`);
               }, 100);
-              
+
               return 0;
             }
           }
@@ -114,26 +117,26 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
         return nextGames;
       });
     } else {
-      // For Casino games, only update wagered amount (it contributes to goal, but doesn't count as a match)
       setWageredAmount(prevWagered => {
         const nextWagered = prevWagered + amount;
         const wagerGoal = LEAGUE_WAGER_GOALS[league];
         const gamesGoal = LEAGUE_GAMES_GOALS[league];
 
-        // Still check for rank up if games played requirement was already met before
-        if (nextWagered >= wagerGoal && gamesPlayed >= gamesGoal) {
+        // Use the ref to get current gamesPlayed without stale closure issues
+        if (nextWagered >= wagerGoal && gamesPlayedRef.current >= gamesGoal) {
           const currentIndex = LEAGUE_ORDER.indexOf(league);
           if (currentIndex < LEAGUE_ORDER.length - 1) {
             const nextLeague = LEAGUE_ORDER[currentIndex + 1];
             const rewardKey = `${league}_${nextLeague}`;
             const reward = LEAGUE_REWARDS[rewardKey] || 0;
-            
+
             setTimeout(() => {
               setLeague(nextLeague);
               setWageredAmount(0);
               setGamesPlayed(0);
-              updateBalance(reward);
-              alert(`🏆 LEAGUE UP! You are now ${nextLeague}. Reward: +${reward} COINS`);
+              gamesPlayedRef.current = 0;
+              setBalance(prev => prev + reward);
+              console.log(`🏆 LEAGUE UP! You are now ${nextLeague}. Reward: +${reward} COINS`);
             }, 100);
             return 0;
           }
@@ -142,7 +145,7 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
-    // 2. Update XP
+    // Update XP
     const xpGain = isRanked ? 25 : 10;
     setXp(prev => {
       const nextXp = prev + xpGain;

@@ -79,7 +79,7 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
                       : 'text-gray-400 hover:text-white hover:bg-white/[0.03]'
                   }`}
                 >
-                  <Icon className={`w-4.5 h-4.5 ${isActive(link.path) ? 'text-primary' : 'text-gray-500 group-hover:text-white'} transition-colors`} />
+                  <Icon className={`w-[18px] h-[18px] ${isActive(link.path) ? 'text-primary' : 'text-gray-500 group-hover:text-white'} transition-colors`} />
                   <span className="text-sm font-bold tracking-tight">{link.label}</span>
                 </Link>
               );

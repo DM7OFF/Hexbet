@@ -169,31 +169,44 @@ export function setupMatchmaking(io: Server) {
 function matchPlayers(io: Server) {
   if (queue.length < 2) return;
 
+  // Pass 1: Try to match same game, same stake, within 500 ELO
   for (let i = 0; i < queue.length; i++) {
     for (let j = i + 1; j < queue.length; j++) {
       const p1 = queue[i];
       const p2 = queue[j];
 
-      // Match criteria: Same game, same stake, similar rank (within 100 ELO)
       if (p1.gameType === p2.gameType && 
           p1.stake === p2.stake && 
-          Math.abs(p1.rank - p2.rank) <= 100) {
+          Math.abs(p1.rank - p2.rank) <= 500) {
         
-        // Match found!
         const matchId = `match_${p1.userId}_${p2.userId}_${Date.now()}`;
         activeMatches[matchId] = { p1, p2, gameType: p1.gameType, stake: p1.stake };
-
-        // Remove from queue
         queue.splice(j, 1);
         queue.splice(i, 1);
 
-        // Notify players
         io.to(p1.socketId).emit('match_found', { matchId, opponent: p2.userId });
         io.to(p2.socketId).emit('match_found', { matchId, opponent: p1.userId });
+        console.log(`Match started (close ELO): ${matchId}`);
+        return matchPlayers(io);
+      }
+    }
+  }
 
-        console.log(`Match started: ${matchId}`);
-        
-        // Break to restart matching process
+  // Pass 2: Fallback – match anyone with same game type and stake (any ELO diff)
+  for (let i = 0; i < queue.length; i++) {
+    for (let j = i + 1; j < queue.length; j++) {
+      const p1 = queue[i];
+      const p2 = queue[j];
+
+      if (p1.gameType === p2.gameType && p1.stake === p2.stake) {
+        const matchId = `match_${p1.userId}_${p2.userId}_${Date.now()}`;
+        activeMatches[matchId] = { p1, p2, gameType: p1.gameType, stake: p1.stake };
+        queue.splice(j, 1);
+        queue.splice(i, 1);
+
+        io.to(p1.socketId).emit('match_found', { matchId, opponent: p2.userId });
+        io.to(p2.socketId).emit('match_found', { matchId, opponent: p1.userId });
+        console.log(`Match started (any ELO fallback): ${matchId}`);
         return matchPlayers(io);
       }
     }

@@ -15,7 +15,7 @@ export default function StatsFloater({ stats, onReset }: StatsFloaterProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="fixed bottom-6 left-[264px] z-40">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 md:left-[264px] md:translate-x-0 z-40">
       <motion.div 
         layout
         className="glass-panel rounded-2xl overflow-hidden border-primary/20 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"

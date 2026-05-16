@@ -23,6 +23,7 @@ export default function CasinoShells() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [cups, setCups] = useState<number[]>([]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
+  const [lastResult, setLastResult] = useState<{ won: boolean; profit: number } | null>(null);
 
   // Auto Mode State
   const [isAuto, setIsAuto] = useState(false);
@@ -134,6 +135,7 @@ export default function CasinoShells() {
         losses: prev.losses + (won ? 0 : 1),
         totalProfit: prev.totalProfit + profit
       }));
+      setLastResult({ won, profit });
     }, isFastMode ? 50 : 500);
   };
 
@@ -363,6 +365,9 @@ export default function CasinoShells() {
                 >
                   <div className={`text-4xl font-display font-black italic tracking-tighter ${selectedIndex === winningIndex ? 'text-success' : 'text-danger'}`}>
                     {selectedIndex === winningIndex ? 'JACKPOT!' : 'EMPTY...'}
+                  </div>
+                  <div className="text-xl font-mono font-bold text-white mt-2">
+                    {lastResult && (lastResult.profit > 0 ? '+' : '')}{lastResult?.profit.toFixed(2)} COINS
                   </div>
                 </motion.div>
               )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Swords, Zap, Shield, Users, Dice5, Target } from 'lucide-react';
+import { Trophy, Swords, Zap, Shield, Users, Dice5, Target, ChevronRight } from 'lucide-react';
 import { socket } from '../App';
 
 const GAMES = [
@@ -171,6 +171,45 @@ export default function RankedLobby() {
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="glass-panel p-6 rounded-xl border-white/5 space-y-4">
+              <h4 className="font-display font-bold text-lg flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary" />
+                Match Rules
+              </h4>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3 text-sm text-gray-400">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                  <span>The winner receives <span className="text-success font-bold">80% of the total pot</span>. 20% goes to house fee/rank rewards.</span>
+                </li>
+                <li className="flex items-start gap-3 text-sm text-gray-400">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                  <span>Matches are <span className="text-white font-bold">provably fair</span> using pre-generated random hashes.</span>
+                </li>
+                <li className="flex items-start gap-3 text-sm text-gray-400">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                  <span>Leaving a match early results in <span className="text-danger font-bold">automatic forfeit</span> of stake.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="glass-panel p-6 rounded-xl border-white/5 space-y-4">
+              <h4 className="font-display font-bold text-lg flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-warning" />
+                Rank Rewards
+              </h4>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Every match earns you <span className="text-white font-bold">Rank XP</span>. Higher leagues unlock larger <span className="text-success font-bold">Max Gains</span> and exclusive multipliers in the Casino.
+              </p>
+              <button 
+                onClick={() => navigate('/ranks')}
+                className="text-xs font-bold text-primary uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2"
+              >
+                View League Benefits <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
           </div>
         </div>
 

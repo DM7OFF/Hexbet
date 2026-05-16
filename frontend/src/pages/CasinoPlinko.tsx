@@ -48,6 +48,7 @@ export default function CasinoPlinko() {
   const [risk, setRisk] = useState<'low' | 'med' | 'high'>('med');
   const [balls, setBalls] = useState<Ball[]>([]);
   const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
+  const [lastResult, setLastResult] = useState<{ multiplier: number; profit: number } | null>(null);
   
   const resetStats = () => {
     setStats({ wins: 0, losses: 0, totalProfit: 0 });
@@ -109,6 +110,7 @@ export default function CasinoPlinko() {
         losses: prev.losses + (multiplier <= 1 ? 1 : 0),
         totalProfit: prev.totalProfit + profit
       }));
+      setLastResult({ multiplier, profit });
       setBalls(prev => prev.filter(b => b.id !== ballId));
     }, isFastMode ? 400 : 3000); // 400ms in fast mode vs 3s
   };
@@ -257,6 +259,26 @@ export default function CasinoPlinko() {
                 ))}
               </AnimatePresence>
             </svg>
+
+            {/* Last Result Overlay */}
+            <AnimatePresence>
+              {lastResult && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute bottom-24 left-1/2 -translate-x-1/2 pointer-events-none"
+                >
+                  <div className={`px-4 py-2 rounded-xl glass-panel border-2 flex items-center gap-3 shadow-2xl ${lastResult.multiplier > 1 ? 'border-success/50 text-success' : 'border-danger/50 text-danger'}`}>
+                    <span className="font-black text-xl">{lastResult.multiplier}x</span>
+                    <div className="w-px h-6 bg-white/10"></div>
+                    <span className="font-mono font-bold text-sm">
+                      {lastResult.profit > 0 ? '+' : ''}{lastResult.profit.toFixed(2)} COINS
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Multipliers */}
             <div className="flex gap-1 w-full justify-center px-4 mb-4">

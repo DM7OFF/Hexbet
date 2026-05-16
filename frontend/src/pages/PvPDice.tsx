@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Swords, User, CheckCircle2 } from 'lucide-react';
 import { socket } from '../App';
 import { useBalance } from '../context/BalanceContext.tsx';
+import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function PvPDice() {
   const { balance, updateBalance, recordWager } = useBalance();
@@ -13,6 +14,11 @@ export default function PvPDice() {
   const [isRolling, setIsRolling] = useState(false);
   const [winner, setWinner] = useState<'me' | 'opponent' | 'draw' | null>(null);
   const [opponentHasRolled, setOpponentHasRolled] = useState(false);
+  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
+
+  const resetStats = () => {
+    setStats({ wins: 0, losses: 0, totalProfit: 0 });
+  };
 
   // Rematch & Stake logic
   const [stake, setStake] = useState(0.5);
@@ -22,6 +28,9 @@ export default function PvPDice() {
 
   const pot = stake * 2;
   const winnerPayout = pot * 0.8;
+
+  const stakeRef = React.useRef(stake);
+  React.useEffect(() => { stakeRef.current = stake; }, [stake]);
 
   useEffect(() => {
     if (!matchId) return;
@@ -38,7 +47,7 @@ export default function PvPDice() {
       setOpponentHasRolled(true);
     });
 
-    socket.on('match_result', (data: { p1: any, p2: any }) => {
+    socket.on('match_result', (data: { p1: any, p2: any, winnerId: string }) => {
       setIsRolling(false);
       setGameState('finished');
       
@@ -48,17 +57,25 @@ export default function PvPDice() {
       setMyRoll(myData.roll);
       setOpponentRoll(oppData.roll);
 
+      const currentStake = stakeRef.current;
+      const pot = currentStake * 2;
+      const payout = pot * 0.8;
+
       if (myData.roll > oppData.roll) {
         setWinner('me');
-        updateBalance(winnerPayout); // Pay out to winner
+        updateBalance(payout);
+        setStats(prev => ({ ...prev, wins: prev.wins + 1, totalProfit: prev.totalProfit + (payout - currentStake) }));
       }
-      else if (oppData.roll > myData.roll) setWinner('opponent');
+      else if (oppData.roll > myData.roll) {
+        setWinner('opponent');
+        setStats(prev => ({ ...prev, losses: prev.losses + 1, totalProfit: prev.totalProfit - currentStake }));
+      }
       else {
         setWinner('draw');
-        updateBalance(stake); // Return stake on draw
+        updateBalance(currentStake);
       }
       
-      setNewStakeInput(stake);
+      setNewStakeInput(currentStake);
     });
 
     socket.on('rematch_proposed', (data: { newStake: number }) => {
@@ -89,7 +106,8 @@ export default function PvPDice() {
       socket.off('rematch_started');
       socket.off('match_ended');
     };
-  }, [matchId, stake, winnerPayout, updateBalance]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchId]);
 
   const handleRoll = () => {
     if (gameState !== 'playing' || myRoll !== null || !matchId) return;
@@ -269,6 +287,7 @@ export default function PvPDice() {
           </div>
         )}
       </div>
+      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }

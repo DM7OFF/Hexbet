@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Dice5, Trophy, RefreshCw, Play, Square, Zap } from 'lucide-react';
 
 import { useBalance } from '../context/BalanceContext.tsx';
@@ -30,6 +30,52 @@ export default function CasinoDice() {
   const [stopOnLoss, setStopOnLoss] = useState<number>(0);
   const [isFastMode, setIsFastMode] = useState(false);
 
+  // Constants — defined before handleRoll so useCallback can reference them
+  const HOUSE_EDGE = 1.5;
+  const MAX_CHANCE = 95;
+  const MIN_CHANCE = 2;
+  const MAX_GAIN = getMaxGain();
+
+  // Derived Values (used in UI and in handleRoll)
+  const multiplier = (100 - HOUSE_EDGE) / winChance;
+  const potentialProfit = betAmount * multiplier - betAmount;
+  const actualProfit = Math.min(potentialProfit, MAX_GAIN);
+  const rollUnder = winChance;
+
+  const handleRoll = useCallback(() => {
+    if (betAmount <= 0 || betAmount > balance) return;
+
+    setRolling(true);
+    setLastRoll(null);
+    updateBalance(-betAmount);
+    recordWager(betAmount);
+
+    const mult = (100 - HOUSE_EDGE) / winChance;
+    const potProfit = betAmount * mult - betAmount;
+    const actualPft = Math.min(potProfit, MAX_GAIN);
+
+    setTimeout(() => {
+      const result = parseFloat((Math.random() * 100).toFixed(2));
+      const won = result < winChance;
+      const profit = won ? actualPft : -betAmount;
+
+      setRolling(false);
+      setLastRoll({ result, won, profit });
+
+      setStats(prev => ({
+        wins: prev.wins + (won ? 1 : 0),
+        losses: prev.losses + (won ? 0 : 1),
+        totalProfit: prev.totalProfit + profit
+      }));
+
+      if (won) {
+        updateBalance(actualPft + betAmount);
+      }
+    }, isFastMode ? 50 : 600);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [betAmount, balance, winChance, isFastMode, MAX_GAIN]);
+
+  // Auto Mode useEffect — depends on handleRoll, so must come AFTER it
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     if (autoRunning && !rolling) {
@@ -49,51 +95,10 @@ export default function CasinoDice() {
       timeout = setTimeout(() => {
         handleRoll();
         setCurrentAutoCount(prev => prev + 1);
-      }, isFastMode ? 50 : 300); // Much faster delay in fast mode
+      }, isFastMode ? 50 : 300);
     }
     return () => clearTimeout(timeout);
-  }, [autoRunning, rolling, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss, isFastMode]);
-
-  // Constants
-  const HOUSE_EDGE = 1.5; // Adjusted to 1.5% as requested
-  const MAX_CHANCE = 95; // Slightly reduced from 98
-  const MIN_CHANCE = 2; // Slightly increased from 1
-  const MAX_GAIN = getMaxGain(); // Maximum profit allowed per bet based on league
-
-  // Derived Values
-  const multiplier = (100 - HOUSE_EDGE) / winChance;
-  const potentialProfit = betAmount * multiplier - betAmount;
-  const actualProfit = Math.min(potentialProfit, MAX_GAIN);
-  const rollUnder = winChance;
-
-  const handleRoll = () => {
-    if (betAmount <= 0 || betAmount > balance) return;
-    
-    setRolling(true);
-    setLastRoll(null);
-    updateBalance(-betAmount); // Deduct stake
-    recordWager(betAmount); // Track progression
-
-    // Simulate network delay and RNG
-    setTimeout(() => {
-      const result = parseFloat((Math.random() * 100).toFixed(2));
-      const won = result < rollUnder;
-      const profit = won ? actualProfit : -betAmount;
-      
-      setRolling(false);
-      setLastRoll({ result, won, profit });
-      
-      setStats(prev => ({
-        wins: prev.wins + (won ? 1 : 0),
-        losses: prev.losses + (won ? 0 : 1),
-        totalProfit: prev.totalProfit + profit
-      }));
-      
-      if (won) {
-        updateBalance(actualProfit + betAmount); // Refund bet + profit
-      }
-    }, isFastMode ? 50 : 600);
-  };
+  }, [autoRunning, rolling, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss, isFastMode, handleRoll]);
 
   const resetStats = () => {
     setStats({ wins: 0, losses: 0, totalProfit: 0 });
@@ -199,7 +204,14 @@ export default function CasinoDice() {
             )}
 
             {/* Roll Button */}
-            {!isAuto ? (
+              <div className="flex justify-between items-center bg-background/50 border border-white/5 rounded-xl p-3">
+                <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Potential Win</span>
+                <span className="text-sm font-mono font-bold text-success">
+                  +{(betAmount * (99 / winChance)).toFixed(2)} COINS
+                </span>
+              </div>
+
+              {!isAuto ? (
               <button 
                 onClick={handleRoll}
                 disabled={rolling || betAmount <= 0}
