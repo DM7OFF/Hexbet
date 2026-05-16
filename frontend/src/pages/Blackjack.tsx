@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBalance } from '../context/BalanceContext';
 import { Wallet, Coins, Trophy, RotateCcw } from 'lucide-react';
 
@@ -24,6 +24,13 @@ export default function Blackjack() {
   const [gameState, setGameState] = useState<'betting' | 'playing' | 'dealer_turn' | 'end'>('betting');
   const [message, setMessage] = useState('');
   const [gameResult, setGameResult] = useState<'win' | 'loss' | 'draw' | null>(null);
+
+  // Auto-adjust bet amount if it exceeds balance
+  useEffect(() => {
+    if (betAmount > balance) {
+      setBetAmount(Math.max(0, balance));
+    }
+  }, [balance, betAmount]);
 
   const createDeck = () => {
     let newDeck: Card[] = [];

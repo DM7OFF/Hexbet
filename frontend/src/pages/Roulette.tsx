@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useBalance } from '../context/BalanceContext';
 import { Wallet, Coins, History, Trophy } from 'lucide-react';
 
@@ -25,6 +25,13 @@ export default function Roulette() {
   const [history, setHistory] = useState<typeof ROULETTE_NUMBERS[0][]>([]);
   const [rotation, setRotation] = useState(0);
   const wheelRef = useRef<HTMLDivElement>(null);
+
+  // Auto-adjust bet amount if it exceeds balance
+  useEffect(() => {
+    if (betAmount > balance) {
+      setBetAmount(Math.max(0, balance));
+    }
+  }, [balance, betAmount]);
 
 
   const handleBet = () => {

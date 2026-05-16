@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBalance } from '../context/BalanceContext';
 import { Wallet, Coins, History, Zap } from 'lucide-react';
 
@@ -12,6 +12,13 @@ export default function Limbo() {
   const [resultMultiplier, setResultMultiplier] = useState<number>(1.0);
   const [gameState, setGameState] = useState<'idle' | 'rolling' | 'win' | 'lose'>('idle');
   const [history, setHistory] = useState<{ mult: number; win: boolean }[]>([]);
+
+  // Auto-adjust bet amount if it exceeds balance
+  useEffect(() => {
+    if (betAmount > balance) {
+      setBetInput(Math.max(0, balance).toString());
+    }
+  }, [balance, betAmount]);
 
   const playLimbo = () => {
     if (betAmount > balance || betAmount <= 0) return;

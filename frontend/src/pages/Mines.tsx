@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bomb, Gem, Trophy, AlertCircle } from 'lucide-react';
 import { useBalance } from '../context/BalanceContext.tsx';
 
@@ -14,6 +14,13 @@ export default function Mines() {
   const { balance, updateBalance, recordWager, updateSessionStats } = useBalance();
   
   const [betAmount, setBetAmount] = useState<number>(10);
+
+  // Auto-adjust bet amount if it exceeds balance
+  useEffect(() => {
+    if (betAmount > balance) {
+      setBetAmount(Math.max(0, balance));
+    }
+  }, [balance, betAmount]);
   const [mineCount, setMineCount] = useState<number>(3);
   const [gameState, setGameState] = useState<GameState>('betting');
   const [tiles, setTiles] = useState<Tile[]>([]);
