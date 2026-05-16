@@ -14,7 +14,7 @@ export default function CasinoDice() {
     }
   }, [balance, betAmount]);
 
-  const [winChance, setWinChance] = useState<number>(49.25); // Default to 2x payout (98.5/2)
+  const [sliderValue, setSliderValue] = useState<number>(50); // The "Roll Under" target
   const [multiplierInput, setMultiplierInput] = useState<string>('2.0000');
   const [rolling, setRolling] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ result: number; won: boolean; profit: number } | null>(null);
@@ -29,30 +29,31 @@ export default function CasinoDice() {
   const [stopOnLoss, setStopOnLoss] = useState<number>(0);
   const [isFastMode, setIsFastMode] = useState(false);
 
-  // Constants — defined before handleRoll so useCallback can reference them
-  const HOUSE_EDGE = 1.5;
+  // Constants
+  const HOUSE_EDGE = 1.0;
   const MAX_CHANCE = 95;
   const MIN_CHANCE = 2;
   const MAX_GAIN = getMaxGain();
 
   // Derived Values
-  const multiplier = (100 - HOUSE_EDGE) / winChance;
+  const multiplier = 100 / sliderValue;
+  const winChance = sliderValue * (100 - HOUSE_EDGE) / 100;
   const potentialProfit = betAmount * multiplier - betAmount;
   const actualProfit = Math.min(potentialProfit, MAX_GAIN);
-  const rollUnder = winChance;
+  const rollUnder = sliderValue;
 
-  // Sync multiplier input when winChance changes from slider
+  // Sync multiplier input when sliderValue changes
   useEffect(() => {
     setMultiplierInput(multiplier.toFixed(4));
-  }, [winChance, multiplier]);
+  }, [sliderValue, multiplier]);
 
   const handleMultiplierChange = (val: string) => {
     setMultiplierInput(val);
     const num = parseFloat(val);
-    if (!isNaN(num) && num >= 1.0103) { // 98.5 / 97.5 ≈ 1.0103 for max 97.5% win chance
-      const newChance = (100 - HOUSE_EDGE) / num;
-      if (newChance >= MIN_CHANCE && newChance <= MAX_CHANCE) {
-        setWinChance(newChance);
+    if (!isNaN(num) && num >= 1.05) { // 100 / 95 (max slider) ≈ 1.052
+      const newSliderValue = 100 / num;
+      if (newSliderValue >= MIN_CHANCE && newSliderValue <= MAX_CHANCE) {
+        setSliderValue(newSliderValue);
       }
     }
   };
@@ -65,13 +66,14 @@ export default function CasinoDice() {
     updateBalance(-betAmount);
     recordWager(betAmount);
 
-    const mult = (100 - HOUSE_EDGE) / winChance;
+    const mult = 100 / sliderValue;
     const potProfit = betAmount * mult - betAmount;
     const actualPft = Math.min(potProfit, MAX_GAIN);
+    const currentWinChance = sliderValue * (100 - HOUSE_EDGE) / 100;
 
     setTimeout(() => {
       const result = parseFloat((Math.random() * 100).toFixed(2));
-      const won = result < winChance;
+      const won = result < currentWinChance;
       const profit = won ? actualPft : -betAmount;
 
       setRolling(false);
@@ -84,7 +86,7 @@ export default function CasinoDice() {
       }
     }, isFastMode ? 50 : 600);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [betAmount, balance, winChance, isFastMode, MAX_GAIN]);
+  }, [betAmount, balance, sliderValue, isFastMode, MAX_GAIN]);
 
   // Auto Mode useEffect — depends on handleRoll, so must come AFTER it
   useEffect(() => {
@@ -297,11 +299,11 @@ export default function CasinoDice() {
                   <div className="absolute top-8 left-0 right-0 h-4 bg-surface rounded-full overflow-hidden border border-white/5">
                     <div 
                       className="absolute top-0 bottom-0 left-0 bg-success/80 border-r-2 border-white"
-                      style={{ width: `${winChance}%` }}
+                      style={{ width: `${sliderValue}%` }}
                     ></div>
                     <div 
                       className="absolute top-0 bottom-0 right-0 bg-danger/80"
-                      style={{ width: `${100 - winChance}%` }}
+                      style={{ width: `${100 - sliderValue}%` }}
                     ></div>
                   </div>
 
@@ -311,15 +313,15 @@ export default function CasinoDice() {
                     min={MIN_CHANCE} 
                     max={MAX_CHANCE} 
                     step="1"
-                    value={winChance}
-                    onChange={(e) => setWinChance(Number(e.target.value))}
+                    value={sliderValue}
+                    onChange={(e) => setSliderValue(Number(e.target.value))}
                     className="w-full absolute top-7 opacity-0 cursor-pointer h-6"
                   />
                   
                   {/* Slider Thumb Visual (Controlled by State) */}
                   <div 
                     className="absolute top-5 w-8 h-10 bg-white rounded shadow-xl border-2 border-secondary flex flex-col items-center justify-center pointer-events-none transition-all"
-                    style={{ left: `calc(${winChance}% - 16px)` }}
+                    style={{ left: `calc(${sliderValue}% - 16px)` }}
                   >
                     <div className="w-1 h-3 bg-secondary/50 rounded-full"></div>
                   </div>
