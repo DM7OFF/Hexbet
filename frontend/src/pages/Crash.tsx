@@ -10,7 +10,6 @@ export default function Crash() {
   const [gameState, setGameState] = useState<'idle' | 'running' | 'crashed' | 'cashed_out'>('idle');
   const [history, setHistory] = useState<number[]>([]);
   const [cashoutAt, setCashoutAt] = useState<number | null>(null);
-  const [crashPoint, setCrashPoint] = useState(0);
   const gameLoopRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const betAmountRef = useRef<number>(betAmount);
@@ -31,7 +30,6 @@ export default function Crash() {
     setGameState('running');
     
     const newCrashPoint = 1 + (Math.random() * (Math.random() < 0.1 ? 10 : 2.5));
-    setCrashPoint(newCrashPoint);
     crashPointRef.current = newCrashPoint;
     
     startTimeRef.current = Date.now();
