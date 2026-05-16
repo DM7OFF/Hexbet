@@ -3,6 +3,7 @@ import { BalanceProvider, useBalance } from './context/BalanceContext.tsx';
 import { Gamepad2, Trophy, Wallet, User, Home, Dice5, History, Zap, Coins } from 'lucide-react';
 import { io } from 'socket.io-client';
 import type { Session } from '@supabase/supabase-js';
+import { BarChart2 } from 'lucide-react';
 import Dashboard from './pages/Dashboard.tsx';
 import RankedLobby from './pages/RankedLobby.tsx';
 import Casino from './pages/Casino.tsx';
@@ -15,11 +16,12 @@ import Ranks from './pages/Ranks.tsx';
 import Roulette from './pages/Roulette.tsx';
 import Limbo from './pages/Limbo.tsx';
 import Blackjack from './pages/Blackjack.tsx';
+import StatsFloater from './components/StatsFloater.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
 function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void }) {
-  const { league, level } = useBalance();
+  const { league, level, setStatsFloaterOpen } = useBalance();
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   const username = session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'Player';
@@ -86,6 +88,17 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
             })}
           </div>
         ))}
+        
+        <div className="space-y-1">
+          <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 mb-2">Tools</h3>
+          <button
+            onClick={() => setStatsFloaterOpen(true)}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group text-gray-400 hover:text-white hover:bg-white/[0.03]"
+          >
+            <BarChart2 className="w-[18px] h-[18px] text-gray-500 group-hover:text-white transition-colors" />
+            <span className="text-sm font-bold tracking-tight">Live Stats</span>
+          </button>
+        </div>
       </div>
 
       <div className="p-4 bg-white/[0.02] border-t border-white/[0.03]">
@@ -147,9 +160,10 @@ function Topbar() {
 
 function AppLayout({ session, onLogout }: { session: Session; onLogout: () => void }) {
   return (
-    <div className="min-h-screen bg-background text-white font-sans">
+    <div className="min-h-screen bg-background text-white font-sans overflow-x-hidden">
       <Sidebar session={session} onLogout={onLogout} />
       <Topbar />
+      <StatsFloater />
       <main className="ml-60 p-8 min-h-[calc(100vh-4rem)]">
         <Routes>
           <Route path="/" element={<Dashboard />} />

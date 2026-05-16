@@ -30,10 +30,9 @@ interface Ball {
 }
 
 import { useBalance } from '../context/BalanceContext.tsx';
-import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function CasinoPlinko() {
-  const { balance, updateBalance, getMaxGain, recordWager } = useBalance();
+  const { balance, updateBalance, getMaxGain, recordWager, updateSessionStats } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
   const MAX_GAIN = getMaxGain();
 
@@ -47,13 +46,7 @@ export default function CasinoPlinko() {
   const [rows, setRows] = useState<number>(8);
   const [risk, setRisk] = useState<'low' | 'med' | 'high'>('med');
   const [balls, setBalls] = useState<Ball[]>([]);
-  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
   const [lastResult, setLastResult] = useState<{ multiplier: number; profit: number } | null>(null);
-  
-  const resetStats = () => {
-    setStats({ wins: 0, losses: 0, totalProfit: 0 });
-  };
-  
   // Auto Mode
   const [isAuto, setIsAuto] = useState(false);
   const [autoRunning, setAutoRunning] = useState(false);
@@ -105,11 +98,7 @@ export default function CasinoPlinko() {
     setTimeout(() => {
       updateBalance(actualPayout); // Add payout to global balance
 
-      setStats(prev => ({
-        wins: prev.wins + (multiplier > 1 ? 1 : 0),
-        losses: prev.losses + (multiplier <= 1 ? 1 : 0),
-        totalProfit: prev.totalProfit + profit
-      }));
+      updateSessionStats(betAmount, profit, multiplier > 1);
       setLastResult({ multiplier, profit });
       setBalls(prev => prev.filter(b => b.id !== ballId));
     }, isFastMode ? 400 : 3000); // 400ms in fast mode vs 3s
@@ -299,7 +288,6 @@ export default function CasinoPlinko() {
           </div>
         </div>
       </div>
-      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }

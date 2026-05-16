@@ -59,6 +59,16 @@ interface BalanceContextType {
   gamesGoal: number;
   recordWager: (amount: number, isRanked?: boolean) => void;
   getMaxGain: () => number;
+  sessionStats: {
+    wins: number;
+    losses: number;
+    totalProfit: number;
+    wagered: number;
+  };
+  updateSessionStats: (wager: number, profit: number, isWin: boolean) => void;
+  resetSessionStats: () => void;
+  isStatsFloaterOpen: boolean;
+  setStatsFloaterOpen: (isOpen: boolean) => void;
 }
 
 const BalanceContext = createContext<BalanceContextType | undefined>(undefined);
@@ -71,6 +81,9 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
   const [level, setLevel] = useState(1);
   const [wageredAmount, setWageredAmount] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
+  const [sessionStats, setSessionStats] = useState({ wins: 0, losses: 0, totalProfit: 0, wagered: 0 });
+  const [isStatsFloaterOpen, setStatsFloaterOpen] = useState(false);
+
   // Track gamesPlayed in a ref so we can read it from inside setState callbacks (avoids stale closure)
   const gamesPlayedRef = React.useRef(0);
 
@@ -80,6 +93,19 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
 
   const updateBalance = (amount: number) => {
     setBalance(prev => prev + amount);
+  };
+
+  const updateSessionStats = (wager: number, profit: number, isWin: boolean) => {
+    setSessionStats(prev => ({
+      wins: prev.wins + (isWin ? 1 : 0),
+      losses: prev.losses + (!isWin ? 1 : 0),
+      totalProfit: prev.totalProfit + profit,
+      wagered: prev.wagered + wager
+    }));
+  };
+
+  const resetSessionStats = () => {
+    setSessionStats({ wins: 0, losses: 0, totalProfit: 0, wagered: 0 });
   };
 
   const recordWager = (amount: number, isRanked: boolean = false) => {
@@ -164,7 +190,8 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <BalanceContext.Provider value={{ 
-      balance, updateBalance, isLoading, league, xp, level, wageredAmount, wagerGoal, gamesPlayed, gamesGoal, recordWager, getMaxGain 
+      balance, updateBalance, isLoading, league, xp, level, wageredAmount, wagerGoal, gamesPlayed, gamesGoal, recordWager, getMaxGain,
+      sessionStats, updateSessionStats, resetSessionStats, isStatsFloaterOpen, setStatsFloaterOpen
     }}>
       {children}
     </BalanceContext.Provider>

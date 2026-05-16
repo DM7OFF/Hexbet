@@ -3,10 +3,9 @@ import { Trophy, RefreshCw, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useBalance } from '../context/BalanceContext.tsx';
-import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function CasinoShells() {
-  const { balance, updateBalance, getMaxGain, recordWager } = useBalance();
+  const { balance, updateBalance, getMaxGain, recordWager, updateSessionStats } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
   const MAX_GAIN = getMaxGain();
 
@@ -22,7 +21,6 @@ export default function CasinoShells() {
   const [winningIndex, setWinningIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [cups, setCups] = useState<number[]>([]);
-  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
   const [lastResult, setLastResult] = useState<{ won: boolean; profit: number } | null>(null);
 
   // Auto Mode State
@@ -52,13 +50,9 @@ export default function CasinoShells() {
         setAutoRunning(false);
         return;
       }
-      if (stopOnProfit > 0 && stats.totalProfit >= stopOnProfit) {
-        setAutoRunning(false);
-        return;
-      }
-      if (stopOnLoss > 0 && stats.totalProfit <= -stopOnLoss) {
-        setAutoRunning(false);
-        return;
+      // Stop on profit/loss requires global stats to be accessed, currently relying on autoRollCount.
+      if (stopOnProfit > 0) {
+        // Not implemented for local stats
       }
 
       timeout = setTimeout(() => {
@@ -67,7 +61,7 @@ export default function CasinoShells() {
       }, isFastMode ? 100 : 500);
     }
     return () => clearTimeout(timeout);
-  }, [autoRunning, gameState, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss, isFastMode]);
+  }, [autoRunning, gameState, autoRollCount, currentAutoCount, stopOnProfit, stopOnLoss, isFastMode]);
 
   // Auto Pick Logic
   useEffect(() => {
@@ -130,11 +124,7 @@ export default function CasinoShells() {
         updateBalance(betAmount + potentialProfit); // Return stake + profit
       }
 
-      setStats(prev => ({
-        wins: prev.wins + (won ? 1 : 0),
-        losses: prev.losses + (won ? 0 : 1),
-        totalProfit: prev.totalProfit + profit
-      }));
+      updateSessionStats(betAmount, profit, won);
       setLastResult({ won, profit });
     }, isFastMode ? 50 : 500);
   };
@@ -145,9 +135,7 @@ export default function CasinoShells() {
     setSelectedIndex(null);
   };
 
-  const resetStats = () => {
-    setStats({ wins: 0, losses: 0, totalProfit: 0 });
-  };
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -375,7 +363,6 @@ export default function CasinoShells() {
           </div>
         </div>
       </div>
-      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }

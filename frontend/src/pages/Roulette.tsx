@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useBalance } from '../context/BalanceContext';
 import { Wallet, Coins, History, Trophy } from 'lucide-react';
-import StatsFloater from '../components/StatsFloater.tsx';
+
 
 const ROULETTE_NUMBERS = [
   { n: 0, color: 'green' },
@@ -17,7 +17,7 @@ const ROULETTE_NUMBERS = [
 ];
 
 export default function Roulette() {
-  const { balance, updateBalance, recordWager, getMaxGain } = useBalance();
+  const { balance, updateBalance, recordWager, getMaxGain, updateSessionStats } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
   const [betType, setBetType] = useState<'red' | 'black' | 'green' | 'even' | 'odd' | number>('red');
   const [isSpinning, setIsSpinning] = useState(false);
@@ -25,7 +25,7 @@ export default function Roulette() {
   const [history, setHistory] = useState<typeof ROULETTE_NUMBERS[0][]>([]);
   const [rotation, setRotation] = useState(0);
   const wheelRef = useRef<HTMLDivElement>(null);
-  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
+
 
   const handleBet = () => {
     if (betAmount > balance) return;
@@ -62,14 +62,14 @@ export default function Roulette() {
       if (multiplier > 0) {
         const winAmount = Math.min(betAmount * multiplier, getMaxGain());
         updateBalance(winAmount);
-        setStats(prev => ({ ...prev, wins: prev.wins + 1, totalProfit: prev.totalProfit + (winAmount - betAmount) }));
+        updateSessionStats(betAmount, winAmount - betAmount, true);
       } else {
-        setStats(prev => ({ ...prev, losses: prev.losses + 1, totalProfit: prev.totalProfit - betAmount }));
+        updateSessionStats(betAmount, -betAmount, false);
       }
     }, 5000);
   };
 
-  const resetStats = () => setStats({ wins: 0, losses: 0, totalProfit: 0 });
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
@@ -249,7 +249,6 @@ export default function Roulette() {
           </div>
         </div>
       </div>
-      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }

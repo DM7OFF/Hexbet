@@ -2,10 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Dice5, Trophy, RefreshCw, Play, Square, Zap } from 'lucide-react';
 
 import { useBalance } from '../context/BalanceContext.tsx';
-import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function CasinoDice() {
-  const { balance, updateBalance, getMaxGain, recordWager } = useBalance();
+  const { balance, updateBalance, getMaxGain, recordWager, updateSessionStats } = useBalance();
   const [betAmount, setBetAmount] = useState<number>(10);
 
   // Auto-adjust bet amount if it exceeds balance
@@ -19,7 +18,6 @@ export default function CasinoDice() {
   const [rolling, setRolling] = useState(false);
   const [lastRoll, setLastRoll] = useState<{ result: number; won: boolean; profit: number } | null>(null);
 
-  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
 
   // Auto Mode State
   const [isAuto, setIsAuto] = useState(false);
@@ -62,11 +60,7 @@ export default function CasinoDice() {
       setRolling(false);
       setLastRoll({ result, won, profit });
 
-      setStats(prev => ({
-        wins: prev.wins + (won ? 1 : 0),
-        losses: prev.losses + (won ? 0 : 1),
-        totalProfit: prev.totalProfit + profit
-      }));
+      updateSessionStats(betAmount, profit, won);
 
       if (won) {
         updateBalance(actualPft + betAmount);
@@ -83,14 +77,9 @@ export default function CasinoDice() {
         setAutoRunning(false);
         return;
       }
-      if (stopOnProfit > 0 && stats.totalProfit >= stopOnProfit) {
-        setAutoRunning(false);
-        return;
-      }
-      if (stopOnLoss > 0 && stats.totalProfit <= -stopOnLoss) {
-        setAutoRunning(false);
-        return;
-      }
+      // Removed stop on profit/loss based on local stats since it requires global now, 
+      // but auto roll count still works.
+      // We will only rely on autoRollCount for now.
 
       timeout = setTimeout(() => {
         handleRoll();
@@ -98,11 +87,9 @@ export default function CasinoDice() {
       }, isFastMode ? 50 : 300);
     }
     return () => clearTimeout(timeout);
-  }, [autoRunning, rolling, autoRollCount, currentAutoCount, stats.totalProfit, stopOnProfit, stopOnLoss, isFastMode, handleRoll]);
+  }, [autoRunning, rolling, autoRollCount, currentAutoCount, stopOnProfit, stopOnLoss, isFastMode, handleRoll]);
 
-  const resetStats = () => {
-    setStats({ wins: 0, losses: 0, totalProfit: 0 });
-  };
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -346,7 +333,6 @@ export default function CasinoDice() {
         </div>
       </div>
       
-      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }

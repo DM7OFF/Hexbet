@@ -3,10 +3,9 @@ import { useParams } from 'react-router-dom';
 import { Swords, User, CheckCircle2 } from 'lucide-react';
 import { socket } from '../App';
 import { useBalance } from '../context/BalanceContext.tsx';
-import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function PvPDice() {
-  const { balance, updateBalance, recordWager } = useBalance();
+  const { balance, updateBalance, recordWager, updateSessionStats } = useBalance();
   const { matchId } = useParams<{ matchId: string }>();
   const [gameState, setGameState] = useState<'waiting' | 'playing' | 'finished'>('waiting');
   const [myRoll, setMyRoll] = useState<number | null>(null);
@@ -14,11 +13,7 @@ export default function PvPDice() {
   const [isRolling, setIsRolling] = useState(false);
   const [winner, setWinner] = useState<'me' | 'opponent' | 'draw' | null>(null);
   const [opponentHasRolled, setOpponentHasRolled] = useState(false);
-  const [stats, setStats] = useState({ wins: 0, losses: 0, totalProfit: 0 });
 
-  const resetStats = () => {
-    setStats({ wins: 0, losses: 0, totalProfit: 0 });
-  };
 
   // Rematch & Stake logic
   const [stake, setStake] = useState(0.5);
@@ -64,11 +59,11 @@ export default function PvPDice() {
       if (myData.roll > oppData.roll) {
         setWinner('me');
         updateBalance(payout);
-        setStats(prev => ({ ...prev, wins: prev.wins + 1, totalProfit: prev.totalProfit + (payout - currentStake) }));
+        updateSessionStats(currentStake, payout - currentStake, true);
       }
       else if (oppData.roll > myData.roll) {
         setWinner('opponent');
-        setStats(prev => ({ ...prev, losses: prev.losses + 1, totalProfit: prev.totalProfit - currentStake }));
+        updateSessionStats(currentStake, -currentStake, false);
       }
       else {
         setWinner('draw');
@@ -287,7 +282,6 @@ export default function PvPDice() {
           </div>
         )}
       </div>
-      <StatsFloater stats={stats} onReset={resetStats} />
     </div>
   );
 }
