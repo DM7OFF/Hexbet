@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dice5, Zap, Swords, Coins, Trophy, Spade } from 'lucide-react';
 
 const CASINO_GAMES = [
-  { id: 'crash', name: 'House Crash', icon: Zap, desc: 'Classic crash. Multiply your crypto instantly.', houseEdge: '1%' },
+  { id: 'limbo', name: 'Limbo', icon: Zap, desc: 'Target a multiplier and win instantly.', houseEdge: '5%' },
   { id: 'dice', name: 'Provably Fair Dice', icon: Dice5, desc: 'Set your win chance. Instant payouts.', houseEdge: '1%' },
   { id: 'plinko', name: 'Plinko', icon: Coins, desc: 'Drop the ball. Watch your multiplier grow.', houseEdge: '1.5%' },
   { id: 'shells', name: 'Shell Game', icon: Trophy, desc: 'Find the ball under the cups. High multipliers.', houseEdge: '1.5%' },
@@ -114,10 +114,10 @@ export default function Casino() {
             <tbody className="text-sm">
               {[
                 { game: 'Dice', player: 'Hidden', bet: '50.00 COINS', mult: '2.00x', payout: '100.00 COINS', win: true },
-                { game: 'Crash', player: 'CryptoPro', bet: '10.00 COINS', mult: '-', payout: '0.00 COINS', win: false },
+                { game: 'Limbo', player: 'CryptoPro', bet: '10.00 COINS', mult: '-', payout: '0.00 COINS', win: false },
                 { game: 'Roulette', player: 'Hidden', bet: '25.00 COINS', mult: '14.00x', payout: '350.00 COINS', win: true },
                 { game: 'Plinko', player: 'MoonBoy', bet: '5.00 COINS', mult: '0.50x', payout: '2.50 COINS', win: false },
-                { game: 'Crash', player: 'Whale', bet: '200.00 COINS', mult: '1.50x', payout: '300.00 COINS', win: true },
+                { game: 'Limbo', player: 'Whale', bet: '200.00 COINS', mult: '1.50x', payout: '300.00 COINS', win: true },
               ].map((bet, i) => (
                 <tr key={i} className="border-t border-white/5 hover:bg-white/5 transition-colors">
                   <td className="p-4 font-bold">{bet.game}</td>

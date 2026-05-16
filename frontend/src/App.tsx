@@ -13,7 +13,7 @@ import PvPDice from './pages/PvPDice.tsx';
 import PvPShells from './pages/PvPShells.tsx';
 import Ranks from './pages/Ranks.tsx';
 import Roulette from './pages/Roulette.tsx';
-import Crash from './pages/Crash.tsx';
+import Limbo from './pages/Limbo.tsx';
 import Blackjack from './pages/Blackjack.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
@@ -38,7 +38,7 @@ function Sidebar({ session, onLogout }: { session: Session; onLogout: () => void
       links: [
         { path: '/casino', label: 'All Games', icon: Dice5 },
         { path: '/casino/dice', label: 'Dice', icon: Dice5 },
-        { path: '/casino/crash', label: 'Crash', icon: Zap },
+        { path: '/casino/limbo', label: 'Limbo', icon: Zap },
       ]
     },
     {
@@ -161,7 +161,7 @@ function AppLayout({ session, onLogout }: { session: Session; onLogout: () => vo
           <Route path="/casino/plinko" element={<CasinoPlinko />} />
           <Route path="/casino/shells" element={<CasinoShells />} />
           <Route path="/casino/roulette" element={<Roulette />} />
-          <Route path="/casino/crash" element={<Crash />} />
+          <Route path="/casino/limbo" element={<Limbo />} />
           <Route path="/casino/blackjack" element={<Blackjack />} />
           <Route path="/ranks" element={<Ranks />} />
           <Route path="/wallet" element={<div className="text-2xl font-bold p-8">Wallet Integration Coming Soon</div>} />
