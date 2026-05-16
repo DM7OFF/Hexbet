@@ -5,8 +5,10 @@ import StatsFloater from '../components/StatsFloater.tsx';
 
 export default function Limbo() {
   const { balance, updateBalance, recordWager, getMaxGain } = useBalance();
-  const [betAmount, setBetAmount] = useState<number>(10);
-  const [targetMultiplier, setTargetMultiplier] = useState<number>(2.0);
+  const [betInput, setBetInput] = useState<string>('10');
+  const [targetInput, setTargetInput] = useState<string>('2.00');
+  const betAmount = Number(betInput) || 0;
+  const targetMultiplier = Math.max(0.01, Number(targetInput) || 0.01);
   const [resultMultiplier, setResultMultiplier] = useState<number>(1.0);
   const [gameState, setGameState] = useState<'idle' | 'rolling' | 'win' | 'lose'>('idle');
   const [history, setHistory] = useState<{ mult: number; win: boolean }[]>([]);
@@ -79,8 +81,8 @@ export default function Limbo() {
             </label>
             <input
               type="number"
-              value={betAmount}
-              onChange={(e) => setBetAmount(Math.max(0, Number(e.target.value)))}
+              value={betInput}
+              onChange={(e) => setBetInput(e.target.value)}
               disabled={gameState === 'rolling'}
               className="w-full bg-surface border-2 border-white/5 rounded-2xl p-4 font-mono font-bold text-xl focus:border-secondary/50 transition-all outline-none disabled:opacity-50"
             />
@@ -95,8 +97,8 @@ export default function Limbo() {
                 type="number"
                 step="0.01"
                 min="1.01"
-                value={targetMultiplier}
-                onChange={(e) => setTargetMultiplier(Math.max(1.01, Number(e.target.value)))}
+                value={targetInput}
+                onChange={(e) => setTargetInput(e.target.value)}
                 disabled={gameState === 'rolling'}
                 className="w-full bg-surface border-2 border-white/5 rounded-2xl p-4 font-mono font-bold text-xl text-warning focus:border-warning/50 transition-all outline-none disabled:opacity-50 pl-10"
               />
@@ -124,6 +126,18 @@ export default function Limbo() {
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Potential Payout</span>
               <span className="text-success font-bold">{(betAmount * targetMultiplier).toFixed(2)} COINS</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Net Profit</span>
+              <span className="text-success font-bold">+{(betAmount * targetMultiplier - betAmount).toFixed(2)} COINS</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">House Edge</span>
+              <span className="text-white font-bold">1.50%</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Max Payout</span>
+              <span className="text-white font-bold">{getMaxGain().toFixed(2)} COINS</span>
             </div>
           </div>
         </div>
