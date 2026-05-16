@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { TowerControl as Tower, Shield, AlertTriangle, Trophy, ArrowUp, ChevronRight, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { TowerControl as Tower, Shield, AlertTriangle, Trophy, Zap } from 'lucide-react';
 import { useBalance } from '../context/BalanceContext.tsx';
 
 type Difficulty = 'easy' | 'medium' | 'hard';

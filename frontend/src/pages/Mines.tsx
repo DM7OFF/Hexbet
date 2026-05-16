@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Bomb, Gem, Trophy, AlertCircle, Coins, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Bomb, Gem, Trophy, AlertCircle } from 'lucide-react';
 import { useBalance } from '../context/BalanceContext.tsx';
 
 type GameState = 'betting' | 'playing' | 'ended';
@@ -11,7 +11,7 @@ interface Tile {
 }
 
 export default function Mines() {
-  const { balance, updateBalance, recordWager, updateSessionStats, getMaxGain } = useBalance();
+  const { balance, updateBalance, recordWager, updateSessionStats } = useBalance();
   
   const [betAmount, setBetAmount] = useState<number>(10);
   const [mineCount, setMineCount] = useState<number>(3);
@@ -39,7 +39,6 @@ export default function Mines() {
   const currentMultiplier = getMultiplier(revealedCount);
   const nextMultiplier = getMultiplier(revealedCount + 1);
   const potentialProfit = (betAmount * currentMultiplier) - betAmount;
-  const nextProfit = (betAmount * nextMultiplier) - betAmount;
 
   // Initialize board
   const startNewGame = () => {
