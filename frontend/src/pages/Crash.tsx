@@ -29,9 +29,9 @@ export default function Crash() {
     setCashoutAt(null);
     setGameState('running');
     
-    // Standard crash game math: 0.99 / Math.random() gives exactly a 1% house edge
+    // Standard crash game math: 0.95 / Math.random() gives exactly a 5% house edge
     // Cap it at 1000x multiplier so it doesn't run forever
-    const newCrashPoint = Math.min(1000, Math.max(1.00, 0.99 / Math.random()));
+    const newCrashPoint = Math.min(1000, Math.max(1.00, 0.95 / Math.random()));
     crashPointRef.current = newCrashPoint;
     
     startTimeRef.current = Date.now();
@@ -86,7 +86,7 @@ export default function Crash() {
         <div>
           <div className="flex items-center gap-3">
             <h2 className="text-4xl font-display font-bold text-secondary">Crash <span className="text-gray-500 text-xl">Moon</span></h2>
-            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: 1%</span>
+            <span className="text-[10px] font-black bg-white/5 border border-white/10 px-2 py-1 rounded-md text-gray-400 uppercase tracking-widest">Edge: 5%</span>
           </div>
           <p className="text-gray-400 mt-2">Cash out before the graph crashes to win!</p>
         </div>
