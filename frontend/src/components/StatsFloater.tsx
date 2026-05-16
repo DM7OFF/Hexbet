@@ -110,16 +110,25 @@ export default function StatsFloater() {
                               const min = Math.min(...profitHistory);
                               const max = Math.max(...profitHistory);
                               const range = max - min === 0 ? 1 : max - min;
+                              const zeroY = 100 - ((0 - min) / range) * 100;
                               const points = profitHistory.map((p, i) => {
                                 const x = (i / Math.max(1, profitHistory.length - 1)) * 100;
                                 const y = 100 - ((p - min) / range) * 100;
                                 return `${x},${y}`;
                               }).join(' ');
-                              const graphColor = sessionStats.totalProfit >= 0 ? '#22c55e' : '#ef4444';
+                              
                               return (
                                 <>
-                                  {min < 0 && max > 0 && <line x1="0" y1={100 - ((0 - min) / range) * 100} x2="100" y2={100 - ((0 - min) / range) * 100} stroke="rgba(255,255,255,0.1)" strokeDasharray="2 2" strokeWidth="1" />}
-                                  <polyline points={points} fill="none" stroke={graphColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  <defs>
+                                    <linearGradient id="profitGradient" x1="0" y1="0" x2="0" y2="100%">
+                                      <stop offset="0%" stopColor="#22c55e" />
+                                      <stop offset={`${Math.max(0, Math.min(100, zeroY))}%`} stopColor="#22c55e" />
+                                      <stop offset={`${Math.max(0, Math.min(100, zeroY))}%`} stopColor="#ef4444" />
+                                      <stop offset="100%" stopColor="#ef4444" />
+                                    </linearGradient>
+                                  </defs>
+                                  {min < 0 && max > 0 && <line x1="0" y1={zeroY} x2="100" y2={zeroY} stroke="rgba(255,255,255,0.1)" strokeDasharray="2 2" strokeWidth="1" />}
+                                  <polyline points={points} fill="none" stroke="url(#profitGradient)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </>
                               );
                             })()}
