@@ -115,10 +115,11 @@ export default function StatsFloater() {
                                 const y = 100 - ((p - min) / range) * 100;
                                 return `${x},${y}`;
                               }).join(' ');
+                              const graphColor = sessionStats.totalProfit >= 0 ? '#22c55e' : '#ef4444';
                               return (
                                 <>
                                   {min < 0 && max > 0 && <line x1="0" y1={100 - ((0 - min) / range) * 100} x2="100" y2={100 - ((0 - min) / range) * 100} stroke="rgba(255,255,255,0.1)" strokeDasharray="2 2" strokeWidth="1" />}
-                                  <polyline points={points} fill="none" stroke="#0ea5e9" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                  <polyline points={points} fill="none" stroke={graphColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </>
                               );
                             })()}
