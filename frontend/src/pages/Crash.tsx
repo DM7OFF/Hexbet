@@ -29,7 +29,9 @@ export default function Crash() {
     setCashoutAt(null);
     setGameState('running');
     
-    const newCrashPoint = 1 + (Math.random() * (Math.random() < 0.1 ? 10 : 2.5));
+    // Standard crash game math: 0.99 / Math.random() gives exactly a 1% house edge
+    // Cap it at 1000x multiplier so it doesn't run forever
+    const newCrashPoint = Math.min(1000, Math.max(1.00, 0.99 / Math.random()));
     crashPointRef.current = newCrashPoint;
     
     startTimeRef.current = Date.now();
