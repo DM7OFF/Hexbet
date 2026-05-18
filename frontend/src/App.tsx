@@ -19,6 +19,8 @@ import Mines from './pages/Mines.tsx';
 import Towers from './pages/Towers.tsx';
 import Blackjack from './pages/Blackjack.tsx';
 import StatsFloater from './components/StatsFloater.tsx';
+import WalletPage from './pages/Wallet.tsx';
+import HistoryPage from './pages/History.tsx';
 
 export const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
 
@@ -149,9 +151,11 @@ function Topbar() {
             <Coins className="w-4 h-4 text-warning" />
             <span className="text-sm font-mono font-black text-white">{balance.toFixed(2)}</span>
           </div>
-          <button className="bg-primary hover:bg-primary/90 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95">
-            Deposit
-          </button>
+          <Link to="/wallet">
+            <button className="bg-primary hover:bg-primary/90 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95">
+              Deposit
+            </button>
+          </Link>
         </div>
         
         <div className="w-10 h-10 rounded-xl bg-card border border-white/[0.03] flex items-center justify-center text-xs font-black text-primary">
@@ -184,8 +188,8 @@ function AppLayout({ session, onLogout }: { session: Session; onLogout: () => vo
           <Route path="/casino/towers" element={<Towers />} />
           <Route path="/casino/blackjack" element={<Blackjack />} />
           <Route path="/ranks" element={<Ranks />} />
-          <Route path="/wallet" element={<div className="text-2xl font-bold p-8">Wallet Integration Coming Soon</div>} />
-          <Route path="/history" element={<div className="text-2xl font-bold p-8">Match History Coming Soon</div>} />
+          <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/history" element={<HistoryPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
